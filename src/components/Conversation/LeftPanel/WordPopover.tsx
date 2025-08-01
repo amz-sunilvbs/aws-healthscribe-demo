@@ -51,7 +51,10 @@ function WordPopover({
             style.color = awsui.colorTextStatusInfo;
             style.fontWeight = 'bold';
         }
-        if (highlightWord) style.color = awsui.colorTextStatusError;
+        if (highlightWord) {
+            style.color = awsui.colorTextStatusError;
+            style.fontWeight = 'bold'; // Make highlighted words bold
+        }
         if (disableSegment) style.color = awsui.colorTextStatusInactive;
 
         return style;

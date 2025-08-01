@@ -11,12 +11,13 @@ import { MedicalScribeJob } from '@aws-sdk/client-transcribe';
 
 import { getPresignedUrl, getS3Object } from '@/utils/S3Api';
 
-type ConversationHeaderProps = {
+type EncounterHeaderProps = {
     jobDetails: MedicalScribeJob | null;
     setShowOutputModal: React.Dispatch<React.SetStateAction<boolean>>;
+    setDeleteModalActive: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export function ConversationHeader({ jobDetails, setShowOutputModal }: ConversationHeaderProps) {
+export function EncounterHeader({ jobDetails, setShowOutputModal, setDeleteModalActive }: EncounterHeaderProps) {
     async function openUrl(detail: { id: string }) {
         let jobUrl: string = '';
         if (detail.id === 'audio') {
@@ -48,6 +49,9 @@ export function ConversationHeader({ jobDetails, setShowOutputModal }: Conversat
                         Download
                     </ButtonDropdown>
                     <Button onClick={() => setShowOutputModal(true)}>View HealthScribe Output</Button>
+                    <Button variant="normal" onClick={() => setDeleteModalActive(true)}>
+                        Delete
+                    </Button>
                 </SpaceBetween>
             }
         >

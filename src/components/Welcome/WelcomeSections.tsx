@@ -17,12 +17,12 @@ export function Overview() {
                 <SpaceBetween size={'s'}>
                     <TextContent>
                         <Box variant="p">
-                            This sample React based web app shows the art of the possible in using AWS HealthScribe.
+                            This sample React based web app shows the art of the possible in using Naina HealthScribe.
                         </Box>
                         <Box variant="p">
-                            AWS HealthScribe is a HIPAA-eligible service empowering healthcare software vendors to build
+                            Naina HealthScribe is a HIPAA-eligible service empowering healthcare software vendors to build
                             clinical applications that automatically generate clinical notes by analyzing
-                            patient-clinician conversations.
+                            patient-clinician encounters.
                         </Box>
                     </TextContent>
                 </SpaceBetween>
@@ -37,8 +37,8 @@ export function Highlights() {
             <Header variant="h2">Highlights</Header>
             <Container>
                 <ul>
-                    <li>Submit an audio file for AWS HealthScribe.</li>
-                    <li>View AWS HealthScribe results.</li>
+                    <li>Submit an audio file for Naina HealthScribe.</li>
+                    <li>View Naina HealthScribe results.</li>
                     <li>Record or generate audio.</li>
                     <li>Integration with Amazon Comprehend Medical.</li>
                 </ul>
@@ -67,7 +67,7 @@ export function Details() {
                     </Box>
                     <Box>
                         <b>
-                            Integrate AWS HealthScribe with{' '}
+                            Integrate Naina HealthScribe with{' '}
                             <Link external href="https://aws.amazon.com/comprehend/medical/">
                                 Amazon Comprehend Medical
                             </Link>
@@ -87,29 +87,5 @@ export function Details() {
                 </SpaceBetween>
             </Container>
         </SpaceBetween>
-    );
-}
-
-export function Footer() {
-    return (
-        <Container>
-            <Box textAlign="center" color="text-body-secondary" fontSize="body-s">
-                <p>Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.</p>
-                <p>
-                    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
-                    associated documentation files (the &quot;Software&quot;), to deal in the Software without
-                    restriction, including without limitation the rights to use, copy, modify, merge, publish,
-                    distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
-                    Software is furnished to do so.
-                </p>
-                <p>
-                    THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-                    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-                    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
-                    OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-                    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-                </p>
-            </Box>
-        </Container>
     );
 }

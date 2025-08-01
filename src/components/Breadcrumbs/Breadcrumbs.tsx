@@ -34,28 +34,28 @@ export default function Breadcrumbs() {
         items = [
             ...baseBreadcrumb,
             {
-                text: 'Conversations',
+                text: 'Encounters',
                 href: '/conversations',
             },
         ];
-    } else if (pathName.startsWith('/conversation/')) {
+    } else if (pathName.startsWith('/encounter/')) {
         const conversationName = pathName.split('/')[2];
         items = [
             ...baseBreadcrumb,
             {
-                text: 'Conversations',
+                text: 'Encounters',
                 href: '/conversations',
             },
             {
                 text: conversationName,
-                href: `/conversations/${conversationName}`,
+                href: `/encounter/${conversationName}`,
             },
         ];
     } else if (pathName === '/new') {
         items = [
             ...baseBreadcrumb,
             {
-                text: 'New Conversation',
+                text: 'File Upload',
                 href: '/new',
             },
         ];

@@ -10,7 +10,6 @@ import Flashbar from '@cloudscape-design/components/flashbar';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import SideNav from '@/components/SideNav';
 import SuspenseLoader from '@/components/SuspenseLoader';
-import TopNav from '@/components/TopNav';
 import Welcome from '@/components/Welcome';
 import { useAuthContext } from '@/store/auth';
 import { useNotificationsContext } from '@/store/notifications';
@@ -18,9 +17,10 @@ import { useNotificationsContext } from '@/store/notifications';
 // Lazy components
 const Debug = lazy(() => import('@/components/Debug'));
 const Settings = lazy(() => import('@/components/Settings'));
-const Conversations = lazy(() => import('@/components/Conversations'));
-const Conversation = lazy(() => import('@/components/Conversation'));
-const NewConversation = lazy(() => import('@/components/NewConversation'));
+const ChangePassword = lazy(() => import('@/components/Settings/ChangePassword'));
+const Encounters = lazy(() => import('@/components/Conversations'));
+const Encounter = lazy(() => import('@/components/Conversation'));
+const NewEncounter = lazy(() => import('@/components/NewConversation'));
 const GenerateAudio = lazy(() => import('@/components/GenerateAudio'));
 
 export default function App() {
@@ -33,11 +33,12 @@ export default function App() {
                 <Routes>
                     <Route index element={<Welcome />} />
                     <Route path="/debug" element={<Debug />} />
-                    <Route path="/conversations" element={<Conversations />} />
-                    <Route path="/conversation/:conversationName" element={<Conversation />} />
-                    <Route path="/new" element={<NewConversation />} />
+                    <Route path="/conversations" element={<Encounters />} />
+                    <Route path="/encounter/:conversationName" element={<Encounter />} />
+                    <Route path="/new" element={<NewEncounter />} />
                     <Route path="/generate" element={<GenerateAudio />} />
                     <Route path="/settings" element={<Settings />} />
+                    <Route path="/settings/change-password" element={<ChangePassword />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             ) : (
@@ -49,20 +50,14 @@ export default function App() {
     );
 
     return (
-        <>
-            <div id="appTopNav">
-                <TopNav />
-            </div>
-            <AppLayout
-                breadcrumbs={<Breadcrumbs />}
-                content={content}
-                headerSelector="#appTopNav"
-                headerVariant="high-contrast"
-                navigation={<SideNav />}
-                navigationHide={!isUserAuthenticated}
-                notifications={<Flashbar items={flashbarItems} />}
-                toolsHide={true}
-            />
-        </>
+        <AppLayout
+            breadcrumbs={<Breadcrumbs />}
+            content={content}
+            headerVariant="high-contrast"
+            navigation={<SideNav />}
+            navigationHide={!isUserAuthenticated}
+            notifications={<Flashbar items={flashbarItems} />}
+            toolsHide={true}
+        />
     );
 }

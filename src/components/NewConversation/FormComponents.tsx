@@ -16,6 +16,9 @@ import TextContent from '@cloudscape-design/components/text-content';
 
 import { MedicalScribeNoteTemplate } from '@aws-sdk/client-transcribe';
 
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { ClinicalNoteTemplate, CLINICAL_NOTE_TEMPLATES } from '@/types/UserPreferences';
+
 import styles from './NewConversation.module.css';
 import { AudioDetails, AudioSelection } from './types';
 
@@ -26,8 +29,7 @@ type InputNameProps = {
 export function InputName({ jobName, setJobName }: InputNameProps) {
     return (
         <FormField
-            label="Job name"
-            description="The name can be up to 200 characters long. Valid characters are a-z, A-Z, 0-9, . (period), _ (underscore), and – (hyphen)."
+            label="Patient Name"
         >
             <Input onChange={({ detail }) => setJobName(detail.value)} placeholder="Name" value={jobName} />
         </FormField>
@@ -39,37 +41,18 @@ type NoteTypeProps = {
     setNoteType: React.Dispatch<React.SetStateAction<MedicalScribeNoteTemplate>>;
 };
 export function NoteType({ noteType, setNoteType }: NoteTypeProps) {
-    const NOTE_TYPES = [
-        { label: 'SOAP (Subjective, Objective, Assessment, Plan)', value: 'HISTORY_AND_PHYSICAL' },
-        { label: 'GIRPP (Goal, Intervention, Response, Progress, Plan)', value: 'GIRPP' },
-    ];
+    const { preferences } = useUserPreferences();
+    
+    // Use centralized note template definitions and filter based on user preferences
+    const NOTE_TYPES = CLINICAL_NOTE_TEMPLATES.filter(noteTemplate => 
+        preferences.enabledNoteTemplates.includes(noteTemplate.value as ClinicalNoteTemplate)
+    );
 
     const selectedOption = useMemo(() => NOTE_TYPES.find((n) => n.value === noteType) || NOTE_TYPES[0], [noteType]);
 
     return (
         <FormField
-            label={
-                <SpaceBetween direction="horizontal" size="xs">
-                    <div>Note type</div>
-                    <Popover
-                        header="Introducing GIRPP notes"
-                        content={
-                            <>
-                                AWS HealthScribe now supports GIRPP note template for behavioral health.{' '}
-                                <Link
-                                    external
-                                    href="https://aws.amazon.com/about-aws/whats-new/2025/02/aws-healthscribe-girpp-note-template-behavioral-health/"
-                                    variant="primary"
-                                >
-                                    Learn more
-                                </Link>
-                            </>
-                        }
-                    >
-                        <StatusIndicator type="info">New</StatusIndicator>
-                    </Popover>
-                </SpaceBetween>
-            }
+            label="Note type"
         >
             <Select
                 selectedOption={selectedOption}

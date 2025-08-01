@@ -1,151 +1,560 @@
-# AWS HealthScribe Demo
+# 🏥 NAINA HEALTHSCRIBE - MULTI-TENANT HEALTHCARE APPLICATION
 
-The AWS HealthScribe Demo app shows the art of the possible
-with [AWS HealthScribe](https://aws.amazon.com/healthscribe/), a HIPAA-elgible service empowering healthcare software
-vendors to build clinical applications that automatically generate clinical notes by analyzing patient-clinician
-conversations.
+**Project Name:** Naina HealthScribe  
+**Description:** Enterprise-grade cloud-based AI Medical Scribe application for healthcare providers. Enables secure, multi-tenant practice management where providers conduct patient encounters to generate transcripts, clinical notes, and actionable insights.  
+**Status:** In Development - DynamoDB-based Multi-Tenant Architecture  
+**Infrastructure:** All resources deployed through Infrastructure as Code (IaC)
 
-After deploying the demo, you can record or submit audio files to AWS HealthScribe, view the status of the job, and
-visualize the transcript and summarized clinical notes, including sections like complaint, history of present illness,
-assessment, and treatment plan.
+## **🎯 BUSINESS REQUIREMENTS**
 
-Additionally, structured medical terms extracted by AWS HealthScribe can be sent
-to [Amazon Comprehend Medical](https://aws.amazon.com/comprehend/medical/) for ontology linking, allowing you to infer
-ICD-10-CM, SNOMED CT, or RxNorm codes.
+### **Multi-Tenant Practice Management**
+- **Practice Isolation**: Complete data segregation between practices
+- **Role-Based Access**: Practice admins, providers, and staff with appropriate permissions
+- **Admin Capabilities**:
+  - Manage practice members (add/remove)
+  - View and edit billing information
+  - Access practice-wide analytics and reporting
 
-This project uses [AWS Amplify](https://aws.amazon.com/amplify/) to deploy a full-stack web application with an UI based
-on [Cloudscape](https://cloudscape.design/), authentication using [Amazon Cognito](https://aws.amazon.com/cognito/) and
-storage using [Amazon Simple Storage Service (S3)](https://aws.amazon.com/s3/).
+### **Clinical Workflow Features**
+- **Encounter Management**: Provider-patient encounter tracking with full audit trail
+- **Clinical Note Editing**: Section-by-section editing and saving capabilities
+- **Task Management**: AI-generated and manual task creation from clinical notes
+- **Document Templates**: Customizable templates for various medical documents
+- **Email Notifications**: Account creation and periodic update notifications
 
-![UI Sample](./images/UI-Sample.gif)
+### **EHR Integration & Patient Context**
+- **EHR Integration**: Seamless integration with external Electronic Health Record systems
+- **Patient Context**: Patient information provided by EHR system during encounter creation
+- **Encounter History**: Chronological encounter tracking per patient from EHR data
+- **Left Sidebar Navigation**: Patient encounter list as shown in EncounterDetails.png
 
-<!-- TOC -->
+### **📋 Current Issues:**
+1. **❌ No Multi-Tenancy**: All providers see all encounters - requires complete data isolation
+2. **❌ No EHR Integration**: Missing integration with external Electronic Health Record systems
+3. **❌ No Provider Isolation**: No data segregation by provider - critical security issue
+4. **❌ No Filtering**: Can't filter encounters by patient name or status
+5. **❌ Wrong Duration**: Shows HealthScribe job processing time, not actual encounter duration
+6. **❌ Missing Encounter List**: No left sidebar with patient encounters navigation
+7. **❌ No Task Management**: Missing AI-generated and manual task creation from clinical notes
+8. **❌ No Document Templates**: No customizable templates for various medical documents
 
-- [Deployment](#deployment)
-    - [Automatic Deployment](#automatic-deployment)
-    - [Semi-Automatic Deployment via AWS CodeCommit](#semi-automatic-deployment-via-aws-codecommit)
-- [Security Considerations](#security-considerations)
-    - [Disable User Sign Ups](#disable-user-sign-ups)
-    - [Encryption At Rest and In Transit](#encryption-at-rest-and-in-transit)
-    - [Access Logging](#access-logging)
-- [Usage](#usage)
-- [Architecture](#architecture)
-- [Cleanup](#cleanup)
-- [FAQ](#faq)
-- [Security](#security)
-- [License](#license)
+### **✅ Required Architecture:**
 
-## Deployment
+```
+Provider (Authenticated User)
+├── Patient 1
+│   ├── Encounter 1 (Audio Recording + Transcript)
+│   ├── Encounter 2 (Audio Recording + Transcript)
+│   └── Encounter 3 (Audio Recording + Transcript)
+├── Patient 2
+│   ├── Encounter 1 (Audio Recording + Transcript)
+│   └── Encounter 2 (Audio Recording + Transcript)
+└── Patient 3
+    └── Encounter 1 (Audio Recording + Transcript)
+```
 
-### Automatic Deployment
+---
 
-This method uses AWS Amplify hosting to build, deploy, and serve the web app. You must have a GitHub account.
+## **🏗️ SOLUTION ARCHITECTURE**
 
-[![amplifybutton](https://oneclick.amplifyapp.com/button.svg)](https://us-east-1.console.aws.amazon.com/amplify/home?region=us-east-1#/deploy?repo=https://github.com/aws-samples/aws-healthscribe-demo)
+### **1. DynamoDB-Based Multi-Tenant Data Model**
 
-- Select the link above.
-- Ensure you are in a region where AWS HealthScribe is available. See the [AWS HealthScribe region table](https://aws.amazon.com/healthscribe/pricing/) for more information. **The demo will not work if deployed to another region. As of October 2024, AWS HealthScribe is available in Virginia (us-east-1).**
-- On the _Welcome to Amplify Hosting_ page, Select _Connect to GitHub_.
-- This redirects you to GitHub for authentication, after which you are redirected back to AWS Amplify.
-- In the _Select service role_ dropdown, select a service role that allows Amplify to deploy the app. If none exist,
-  select _Create new role_ and follow the prompts.
-- Select _Save and deploy_.
-    - This repository will be forked to your GitHub account for deployment.
-      See the FAQ for instructions on deploying this demo with a private repository.
+#### **Core Tables Structure**
+```typescript
+// Table 1: Providers
+interface Provider {
+    providerId: string;        // PK: Cognito user sub
+    email: string;
+    name: string;
+    specialty?: string;
+    ehrSystemId?: string;      // EHR system identifier
+    createdAt: string;
+    updatedAt: string;
+}
 
-_Note:_ if the deployment hangs on the _Forking your GitHub repository_ for more than a minute, refresh the page and
-repeat the steps above.
+// Table 2: Encounters
+interface Encounter {
+    encounterId: string;       // PK: UUID
+    providerId: string;        // GSI: Provider's encounters
+    patientId: string;         // GSI: Patient's encounters (from EHR)
+    patientName: string;       // From EHR system
+    ehrEncounterId?: string;   // EHR system encounter ID
+    healthScribeJobName: string; // Link to HealthScribe job
+    encounterDate: string;
+    encounterDuration: number; // Actual recording duration
+    status: 'RECORDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+    audioFileUri?: string;
+    transcriptUri?: string;
+    clinicalNotesUri?: string;
+    // EHR Integration fields
+    ehrPatientData?: {         // Patient context from EHR
+        patientId: string;
+        patientName: string;
+        dateOfBirth?: string;
+        mrn?: string;          // Medical Record Number
+        demographics?: any;
+    };
+    createdAt: string;
+    updatedAt: string;
+}
 
-### Semi-Automatic Deployment via AWS CodeCommit
+// Table 3: Tasks (Future Enhancement)
+interface Task {
+    taskId: string;            // PK: UUID
+    encounterId: string;       // GSI: Encounter's tasks
+    providerId: string;        // GSI: Provider's tasks
+    title: string;
+    category: string;
+    description?: string;
+    status: 'PENDING' | 'COMPLETED';
+    createdAt: string;
+    updatedAt: string;
+    completedAt?: string;
+}
 
-See the [deployment guide](./docs/deploy.md) for semi-automatic steps.
+// Table 4: Templates (Future Enhancement)
+interface Template {
+    templateId: string;        // PK: UUID
+    providerId: string;        // GSI: Provider's templates
+    templateName: string;
+    templateType: string;
+    sections: TemplateSection[];
+    formatting: TemplateFormatting;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+```
 
-## Security Considerations
+### **2. Authentication & Authorization**
 
-_Note:_ this demo is provided as a sample, and not meant to be used in a production capacity. Please review your
-organization's compliance requirements prior to uploading any data containing PHI.
+#### **Cognito Integration**
+```typescript
+// Get current provider from Cognito
+const getCurrentProvider = async (): Promise<Provider> => {
+    const user = await getCurrentUser();
+    
+    // Auto-create provider record on first login
+    let provider = await getProvider(user.sub);
+    if (!provider) {
+        provider = await createProvider({
+            providerId: user.sub,
+            email: user.signInDetails?.loginId || user.username,
+            name: user.attributes?.name || user.username,
+            specialty: '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        });
+    }
+    
+    return provider;
+};
+```
 
-### Disable User Sign Ups
+#### **Data Access Control**
+```typescript
+// All data operations scoped to current provider
+const getProviderEncounters = async (providerId: string): Promise<Encounter[]> => {
+    return await queryEncountersByProvider(providerId);
+};
 
-By default, any user with a valid email can sign up and authenticate into the web app. To disable this feature, and add
-users manually (or turn off sign ups after you have signed up),
+const getPatientEncounters = async (patientId: string, providerId: string): Promise<Encounter[]> => {
+    // Get encounters for a specific patient, scoped to current provider
+    return await queryEncountersByPatientAndProvider(patientId, providerId);
+};
+```
 
-- Navigate to [Amazon Cognito](https://console.aws.amazon.com/cognito/v2/home) in the AWS console
-- Select the user pool for this web app. It should be named `healthScribeDemoAuthUserPool-<unique id>`.
-- Select the _Sign-up experience_ tab.
-- Scroll to the bottom to the _Self-service sign-up_ section, and select the _Edit_ button for this box.
-- Uncheck _Enable self-registration_.
-- Select _Save changes_.
+### **3. Enhanced Recording & Encounter Flow**
 
-### Encryption At Rest and In Transit
+#### **EHR-Integrated Recording Process**
+```typescript
+const createEncounterWithEHRPatient = async (encounterData: {
+    providerId: string;
+    ehrPatientData: {
+        patientId: string;
+        patientName: string;
+        dateOfBirth?: string;
+        mrn?: string;
+        demographics?: any;
+    };
+    ehrEncounterId?: string;
+    audioFileUri: string;
+    encounterDuration: number;
+}) => {
+    // Generate unique identifiers
+    const encounterId = generateUUID();
+    const healthScribeJobName = `${encounterData.providerId}-${encounterData.ehrPatientData.patientId}-${Date.now()}`;
+    
+    // Create encounter record with EHR patient data
+    const encounter: Encounter = {
+        encounterId,
+        providerId: encounterData.providerId,
+        patientId: encounterData.ehrPatientData.patientId,
+        patientName: encounterData.ehrPatientData.patientName,
+        ehrEncounterId: encounterData.ehrEncounterId,
+        healthScribeJobName,
+        encounterDate: new Date().toISOString(),
+        encounterDuration: encounterData.encounterDuration,
+        status: 'PROCESSING',
+        audioFileUri: encounterData.audioFileUri,
+        ehrPatientData: encounterData.ehrPatientData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    // Store encounter metadata
+    await createEncounter(encounter);
+    
+    // Submit to HealthScribe
+    await submitHealthScribeJob(healthScribeJobName, encounterData.audioFileUri);
+    
+    return encounterId;
+};
+```
 
-All traffic between the client (browser) and the server (AWS Amplify Hosting, AWS HealthScribe, Amazon S3) is encrypted
-in transit. Audio files uploaded to S3 and AWS HealthScribe output JSON is encrypted at rest.
+### **4. Enhanced UI Architecture**
 
-### Access Logging
+#### **Multi-Tenant Encounters List**
+```typescript
+const EncountersList = () => {
+    const [encounters, setEncounters] = useState<Encounter[]>([]);
+    const [filteredEncounters, setFilteredEncounters] = useState<Encounter[]>([]);
+    const [currentProvider, setCurrentProvider] = useState<Provider>();
+    
+    useEffect(() => {
+        const loadProviderData = async () => {
+            const provider = await getCurrentProvider();
+            setCurrentProvider(provider);
+            
+            // Load only provider's encounters
+            const providerEncounters = await getProviderEncounters(provider.providerId);
+            setEncounters(providerEncounters);
+            setFilteredEncounters(providerEncounters);
+        };
+        
+        loadProviderData();
+    }, []);
+    
+    return (
+        <Table
+            columnDefinitions={[
+                {
+                    id: 'patientName',
+                    header: 'Patient Name',
+                    cell: (e: Encounter) => e.patientName,
+                    sortingField: 'patientName',
+                },
+                {
+                    id: 'encounterDate',
+                    header: 'Encounter Date',
+                    cell: (e: Encounter) => dayjs(e.encounterDate).format('MMMM D YYYY, H:mm'),
+                    sortingField: 'encounterDate',
+                },
+                {
+                    id: 'duration',
+                    header: 'Duration',
+                    cell: (e: Encounter) => formatDuration(e.encounterDuration),
+                    sortingField: 'encounterDuration',
+                },
+                {
+                    id: 'status',
+                    header: 'Status',
+                    cell: (e: Encounter) => (
+                        <StatusIndicator type={getStatusType(e.status)}>
+                            {e.status}
+                        </StatusIndicator>
+                    ),
+                    sortingField: 'status',
+                }
+            ]}
+            items={filteredEncounters}
+            filter={
+                <PropertyFilter
+                    filteringProperties={[
+                        { key: 'patientName', operators: [':', '!:', '=', '!='] },
+                        { key: 'status', operators: [':', '!:', '=', '!='] },
+                        { key: 'encounterDate', operators: ['>', '<', '=', '!='] }
+                    ]}
+                    onChange={({ detail }) => handleFilterChange(detail)}
+                />
+            }
+            pagination={<Pagination currentPageIndex={1} pagesCount={10} />}
+        />
+    );
+};
+```
 
-Access logging is enabled for audio files and HealthScribe output in S3. These audit logs are written to a separate S3
-bucket with a name starting with `amplify-awshealthscribedemo-loggingbucket`. Both buckets are retained when you delete
-the app.
+#### **Enhanced Encounter Detail Page**
+```typescript
+const EncounterDetail = () => {
+    const { healthScribeJobName } = useParams();
+    const [encounter, setEncounter] = useState<Encounter>();
+    const [patientEncounters, setPatientEncounters] = useState<Encounter[]>([]);
+    const [activeTab, setActiveTab] = useState('transcript');
+    
+    useEffect(() => {
+        const loadEncounterData = async () => {
+            // Load current encounter
+            const currentEncounter = await getEncounterByJobName(healthScribeJobName);
+            setEncounter(currentEncounter);
+            
+            // Load all encounters for this patient
+            const allPatientEncounters = await getEncountersByPatient(currentEncounter.patientId);
+            setPatientEncounters(allPatientEncounters);
+        };
+        
+        loadEncounterData();
+    }, [healthScribeJobName]);
+    
+    return (
+        <Grid gridDefinition={[
+            { colspan: { default: 12, xs: 3, s: 3, m: 3, l: 3 } }, // Left sidebar
+            { colspan: { default: 12, xs: 9, s: 9, m: 9, l: 9 } }  // Main content
+        ]}>
+            {/* Left Sidebar - Patient Encounters List */}
+            <Container>
+                <SpaceBetween size="s">
+                    <Box variant="h3">
+                        {encounter?.patientName} - Encounters
+                    </Box>
+                    {patientEncounters.map(enc => (
+                        <Box
+                            key={enc.encounterId}
+                            padding="s"
+                            className={enc.encounterId === encounter?.encounterId ? 'selected' : ''}
+                        >
+                            <Link to={`/encounter/${enc.healthScribeJobName}`}>
+                                <Box variant="strong">
+                                    {dayjs(enc.encounterDate).format('MMM D, YYYY')}
+                                </Box>
+                                <Box variant="small" color="text-body-secondary">
+                                    {dayjs(enc.encounterDate).format('h:mm A')}
+                                </Box>
+                                <Box variant="small" color="text-body-secondary">
+                                    Duration: {formatDuration(enc.encounterDuration)}
+                                </Box>
+                                <StatusIndicator type={getStatusType(enc.status)}>
+                                    {enc.status}
+                                </StatusIndicator>
+                            </Link>
+                        </Box>
+                    ))}
+                </SpaceBetween>
+            </Container>
+            
+            {/* Main Content - Enhanced Tabs */}
+            <Container>
+                <SpaceBetween size="m">
+                    {/* Patient & Encounter Context */}
+                    <Box>
+                        <Box variant="h2">{encounter?.patientName}</Box>
+                        <Box variant="small" color="text-body-secondary">
+                            Encounter: {dayjs(encounter?.encounterDate).format('MMMM D, YYYY [at] h:mm A')} 
+                            • Duration: {formatDuration(encounter?.encounterDuration || 0)}
+                        </Box>
+                    </Box>
+                    
+                    {/* Tabs */}
+                    <Tabs
+                        activeTabId={activeTab}
+                        onChange={({ detail }) => setActiveTab(detail.activeTabId)}
+                        tabs={[
+                            {
+                                id: 'transcript',
+                                label: 'Transcript',
+                                content: <TranscriptTab encounter={encounter} />
+                            },
+                            {
+                                id: 'clinical-note',
+                                label: 'Clinical Note', 
+                                content: <ClinicalNoteTab encounter={encounter} />
+                            },
+                            {
+                                id: 'insights',
+                                label: 'Insights',
+                                content: <InsightsTab encounter={encounter} />
+                            },
+                            {
+                                id: 'tasks',
+                                label: 'Tasks',
+                                content: <TasksTab encounter={encounter} />
+                            }
+                        ]}
+                    />
+                </SpaceBetween>
+            </Container>
+        </Grid>
+    );
+};
+```
 
-## Usage
+---
 
-Amplify deploys a public-accessible website. When you first visit the site, select the **Sign In** link at the top right
-of the page. From there, select **Create Account** and fill in the required information. Once authenticated, you have
-access to all features of this web app. Note that all conversations are viewable by any authenticated user.
+## **🔧 IMPLEMENTATION PHASES**
 
-## Architecture
+### **Phase 1: Core Multi-Tenancy Foundation (3-4 weeks)**
+1. **DynamoDB Tables Infrastructure (IaC)**
+   - Create Providers and Encounters tables
+   - Configure proper GSIs and access patterns
+   - Set up IAM roles and policies
+   - Enable encryption and backup
 
-![AWS HealthScribe Demo Architecture](./images/AWS-HealthScribe-Demo-Architecture.png)
+2. **Data Access Layer Implementation**
+   - Create TypeScript interfaces for all entities
+   - Implement CRUD operations with proper validation
+   - Add comprehensive error handling and logging
+   - Create unit tests with >90% coverage
 
-## Cleanup
+3. **Authentication Integration**
+   - Auto-create provider records on first login
+   - Implement provider context middleware
+   - Add authorization checks for all operations
+   - Create provider profile management
 
-_Note:_ the S3 bucket containing audio files and HealthScribe output is retained during delete. The S3 bucket containing
-access logs for the former is also retained during delete.
+### **Phase 2: EHR Integration & Encounter Management (3-4 weeks)**
+1. **EHR Integration Layer**
+   - Create EHR patient data interfaces
+   - Implement patient context handling from EHR
+   - Add EHR encounter ID mapping
+   - Create patient data validation
 
-- Navigate to the [AWS console for AWS Amplify](https://console.aws.amazon.com/amplify/home).
-- Select the web app.
-- On the top right, select _Actions_, then _Delete app_.
+2. **Enhanced Encounter Creation Flow**
+   - Integrate EHR patient selection into recording flow
+   - Update HealthScribe job creation with EHR metadata
+   - Implement proper status tracking
+   - Store actual recording duration
 
-## FAQ
+3. **Multi-Tenant Encounters List**
+   - Filter encounters by current provider
+   - Add patient name and status filtering
+   - Update table columns with proper formatting
+   - Implement pagination and sorting
 
-#### The public sample repo has been updated. How do I update my local deployment to the latest code?
+4. **Enhanced Encounter Detail Page**
+   - Add left sidebar with patient encounter history
+   - Improve main content layout and navigation
+   - Add patient context and metadata display
+   - Implement breadcrumb navigation
 
-During the initial deployment, AWS Amplify forked this repository to your GitHub account. Amplify then built a CI/CD
-pipeline using your fork as the source.
-To update your Amplify deployment, sync your fork with this repository:
+### **Phase 3: Advanced Features (6-8 weeks)**
+1. **Task Management System**
+   - Create Tasks DynamoDB table
+   - Implement AI-powered task generation from clinical notes
+   - Build task management UI with full CRUD operations
+   - Add task status tracking and completion
 
-1. Navigate to the fork in your GitHub account.
-2. Select "Sync fork."
-3. Select "Update branch."
+2. **Custom Document Templates**
+   - Create Templates DynamoDB table
+   - Build template management system
+   - Create template editor with drag-and-drop
+   - Integrate templates with clinical note generation
 
-#### Can I use this UI with existing AWS HealthScribe jobs?
+3. **Practice Management & Multi-Tenancy**
+   - Implement practice-level multi-tenancy
+   - Create practice management UI
+   - Add email notification system
+   - Implement audit logging and compliance features
 
-Yes, but you will have to grant the Amazon Cognito identity pool's authenticated role access to the S3 bucket where the
-input audio files and output JSON files are located.
+### **Phase 4: Testing & Deployment (2-3 weeks)**
+1. **Comprehensive Testing**
+   - Unit tests for all business logic
+   - Integration tests for API endpoints
+   - End-to-end tests for critical flows
+   - Performance and security testing
 
-1. Navigate to [Amazon Cognito Identy Pools](https://console.aws.amazon.com/cognito/v2/identity) in the AWS console.
-   Make sure you are in the correct region.
-2. Select the identity pool associated with the demo. It is named similar to `healthScribeDemoAuthIdentityPool..`
-3. Select the "User access" tab.
-4. Select the link under "Authenticated role." This will open a new tab to the IAM role assumed by authenticated users.
-5. Add `s3:GetObject` actions for the S3 bucket(s) where your existing audio input and JSON output files are located.
+2. **Production Deployment**
+   - Environment-specific configurations
+   - Monitoring and alerting setup
+   - Backup and disaster recovery
+   - Security compliance verification
 
-#### Can I deploy this demo from a private repository?
+---
 
-Yes. Amplify Hosting supports connections to private repositories hosted on
-public [GitHub, Bitbucket, and GitLab](https://docs.aws.amazon.com/amplify/latest/userguide/getting-started.html#step-1-connect-repository).
+## **📊 DATA FLOW ARCHITECTURE**
 
-1. [Duplicate this repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/duplicating-a-repository)
-   to your private repository hosted on public GitHub, Bitbucket, or GitLab.
-2. Use Amplify Hosting to [connect to your private repository](https://docs.aws.amazon.com/amplify/latest/userguide/getting-started.html#step-1-connect-repository).
+### **Current Flow (Single Tenant):**
+```
+User Login → See All Encounters → Select Encounter → View Details
+```
 
-Alternatively, you can use a private AWS CodeCommit repository with the [Semi-Automatic Deployment](#semi-automatic-deployment-via-aws-codecommit) method.
+### **Proposed Flow (Multi-Tenant):**
+```
+Provider Login → See Only Their Encounters → Filter by Patient/Status → Select Encounter → View Details with Patient Context
+```
 
-## Security
+### **Enhanced Recording Flow:**
+```
+Provider → Select/Create Patient → Start Recording → Submit Encounter → 
+Auto-tag with Provider/Patient Info → Process with HealthScribe → 
+Store Encounter Metadata → Display in Provider's Encounter List
+```
 
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+---
 
-## License
+## **🛡️ SECURITY & COMPLIANCE**
 
-This library is licensed under the MIT-0 License. See the LICENSE file.
+### **Data Isolation:**
+- **Provider Level**: Each provider only sees their data
+- **Patient Level**: Patient data tied to specific provider
+- **Encounter Level**: Encounters linked to provider-patient relationship
+
+### **HIPAA Compliance:**
+- **Audit Logging**: Track all data access
+- **Encryption**: All data encrypted at rest and in transit
+- **Access Controls**: Role-based access to patient data
+- **Data Retention**: Configurable retention policies
+
+---
+
+## **🧪 TESTING SCENARIOS**
+
+### **Multi-Tenancy Testing:**
+1. **Provider A** creates encounters for Patients 1, 2, 3
+2. **Provider B** creates encounters for Patients 4, 5, 6
+3. **Provider A** login should only see Patients 1, 2, 3 encounters
+4. **Provider B** login should only see Patients 4, 5, 6 encounters
+
+### **Filtering Testing:**
+1. Filter by Patient Name: "John" should show only John's encounters
+2. Filter by Status: "COMPLETED" should show only completed encounters
+3. Combined filters should work together
+
+### **Duration Testing:**
+1. Record 30-second audio
+2. Duration column should show "00:30" (recording time)
+3. NOT the HealthScribe processing time (which might be 2+ minutes)
+
+---
+
+## **📋 IMPLEMENTATION CHECKLIST**
+
+### **✅ Phase 1 - Core Foundation (DynamoDB-Based)**
+- [ ] Create DynamoDB tables for Providers and Encounters through IaC
+- [ ] Implement data access layer with proper CRUD operations
+- [ ] Integrate with Cognito authentication for provider management
+- [ ] Add provider-based data isolation and authorization
+- [ ] Create comprehensive unit tests for all business logic
+
+### **✅ Phase 2 - EHR Integration & Encounter Management**
+- [ ] Implement EHR patient data interfaces and validation
+- [ ] Create EHR integration layer for patient context handling
+- [ ] Update encounter creation to include EHR patient metadata
+- [ ] Implement multi-tenant encounters list with proper filtering
+- [ ] Fix duration column to show actual recording duration
+- [ ] Create enhanced encounter detail page with left sidebar navigation
+- [ ] Add patient context and encounter history display
+
+### **✅ Phase 3 - Advanced Features**
+- [ ] Implement task management system with AI-generated tasks
+- [ ] Create custom document templates functionality
+- [ ] Add practice-level multi-tenancy and admin capabilities
+- [ ] Implement email notification system
+- [ ] Add comprehensive audit logging and compliance features
+
+### **✅ Phase 4 - Testing & Production**
+- [ ] Complete comprehensive testing strategy (unit, integration, e2e)
+- [ ] Set up monitoring, alerting, and backup systems
+- [ ] Deploy through IaC pipeline with environment separation
+- [ ] Verify security compliance and HIPAA requirements
+
+**Note**: All infrastructure changes must be implemented through Infrastructure as Code (IaC) only. No manual AWS console changes are permitted.

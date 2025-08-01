@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT-0
 import React, { useState } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+
 import Alert from '@cloudscape-design/components/alert';
 import Box from '@cloudscape-design/components/box';
 import Button from '@cloudscape-design/components/button';
@@ -9,25 +11,24 @@ import Modal from '@cloudscape-design/components/modal';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import Spinner from '@cloudscape-design/components/spinner';
 
-import { MedicalScribeJobSummary } from '@aws-sdk/client-transcribe';
+import { MedicalScribeJob } from '@aws-sdk/client-transcribe';
 
 import { useNotificationsContext } from '@/store/notifications';
 import { deleteHealthScribeJob } from '@/utils/HealthScribeApi';
 
-type DeleteModalProps = {
-    selectedHealthScribeJob: MedicalScribeJobSummary[];
+type DeleteEncounterModalProps = {
+    jobDetails: MedicalScribeJob | null;
     deleteModalActive: boolean;
     setDeleteModalActive: React.Dispatch<React.SetStateAction<boolean>>;
-    refreshTable: () => void;
 };
 
-export function DeleteEncounter({
-    selectedHealthScribeJob,
+export function DeleteEncounterModal({
+    jobDetails,
     deleteModalActive,
     setDeleteModalActive,
-    refreshTable,
-}: DeleteModalProps) {
+}: DeleteEncounterModalProps) {
     const { addFlashMessage } = useNotificationsContext();
+    const navigate = useNavigate();
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
     async function doDelete(medicalScribeJobName: string) {
@@ -35,7 +36,14 @@ export function DeleteEncounter({
         setIsDeleting(true);
         try {
             await deleteHealthScribeJob({ MedicalScribeJobName: medicalScribeJobName });
-            refreshTable();
+            addFlashMessage({
+                id: `Deleted encounter: ${medicalScribeJobName}`,
+                header: 'Encounter Deleted',
+                content: `Successfully deleted encounter "${medicalScribeJobName}"`,
+                type: 'success',
+            });
+            // Navigate back to encounters list after successful deletion
+            navigate('/conversations');
         } catch (err) {
             addFlashMessage({
                 id: err?.toString() || 'Error deleting HealthScribe job',
@@ -61,7 +69,7 @@ export function DeleteEncounter({
                         <Button
                             disabled={isDeleting}
                             variant="primary"
-                            onClick={() => doDelete(selectedHealthScribeJob?.[0]?.MedicalScribeJobName || '')}
+                            onClick={() => doDelete(jobDetails?.MedicalScribeJobName || '')}
                         >
                             {isDeleting ? <Spinner /> : 'Delete'}
                         </Button>
@@ -71,7 +79,7 @@ export function DeleteEncounter({
             header="Delete Naina HealthScribe Encounter"
         >
             <p>
-                Permanently delete <strong>{selectedHealthScribeJob?.[0]?.MedicalScribeJobName || ''}</strong>. You
+                Permanently delete <strong>{jobDetails?.MedicalScribeJobName || ''}</strong>. You
                 cannot undo this action.
             </p>
             <Alert statusIconAriaLabel="Info">

@@ -3,8 +3,10 @@
 import React, { RefObject, useEffect, useMemo, useState } from 'react';
 
 import Box from '@cloudscape-design/components/box';
+import Button from '@cloudscape-design/components/button';
 import Checkbox from '@cloudscape-design/components/checkbox';
 import Container from '@cloudscape-design/components/container';
+import Icon from '@cloudscape-design/components/icon';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import Spinner from '@cloudscape-design/components/spinner';
 
@@ -123,9 +125,21 @@ export default function TopPanel({
                     setAudioReady(true);
                 });
 
+                // Add event listeners to sync playingAudio state
+                wavesurfer.current?.on('play', () => {
+                    console.log('Wavesurfer PLAY event fired');
+                    setPlayingAudio(true);
+                });
+
+                wavesurfer.current?.on('pause', () => {
+                    console.log('Wavesurfer PAUSE event fired');
+                    setPlayingAudio(false);
+                });
+
                 // Do not loop around
                 wavesurfer.current?.on('finish', () => {
-                    setPlayingAudio(!!wavesurfer.current?.isPlaying());
+                    console.log('Wavesurfer FINISH event fired');
+                    setPlayingAudio(false);
                 });
 
                 const updateTimer = () => {
@@ -145,7 +159,6 @@ export default function TopPanel({
                 });
             }
         }
-
         if (!jobLoading && waveformElement) getAudio().catch(console.error);
     }, [jobLoading, waveformElement]);
 
@@ -223,30 +236,37 @@ export default function TopPanel({
     }
 
     return (
-        <>
-            <AudioControls
-                wavesurfer={wavesurfer}
-                audioLoading={audioLoading}
-                showControls={showControls}
-                setShowControls={setShowControls}
-                playingAudio={playingAudio}
-                setPlayingAudio={setPlayingAudio}
-                playBackSpeed={playBackSpeed}
-                setPlayBackSpeed={setPlayBackSpeed}
-            />
-            <Container>
-                {(jobLoading || audioLoading) && <Loading />}
-                <SegmentControls />
-                <div style={{ height: audioLoading ? 0 : '' }}>
-                    <div
-                        id="waveform"
-                        style={{
-                            marginTop: '5px',
-                            height: audioLoading ? 0 : '',
-                        }}
+        <Container>
+            {(jobLoading || audioLoading) && <Loading />}
+            
+            {/* Audio Controls - At the same level, not nested */}
+            {!jobLoading && !audioLoading && (
+                <div style={{ marginBottom: '16px' }}>
+                    <Box variant="awsui-key-label" margin={{ bottom: 's' }}>Audio Controls</Box>
+                    <AudioControls
+                        wavesurfer={wavesurfer}
+                        audioLoading={audioLoading}
+                        showControls={true}
+                        setShowControls={setShowControls}
+                        playingAudio={playingAudio}
+                        setPlayingAudio={setPlayingAudio}
+                        playBackSpeed={playBackSpeed}
+                        setPlayBackSpeed={setPlayBackSpeed}
+                        isEmbeded={true}
                     />
                 </div>
-            </Container>
-        </>
+            )}
+            
+            <SegmentControls />
+            <div style={{ height: audioLoading ? 0 : '' }}>
+                <div
+                    id="waveform"
+                    style={{
+                        marginTop: '5px',
+                        height: audioLoading ? 0 : '',
+                    }}
+                />
+            </div>
+        </Container>
     );
 }

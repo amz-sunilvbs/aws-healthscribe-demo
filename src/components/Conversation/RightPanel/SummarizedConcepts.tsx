@@ -66,7 +66,7 @@ export default function SummarizedConcepts({
             currentIdLocal = 0;
         }
         const id = EvidenceLinks[currentIdLocal].SegmentId;
-        // Set state back to Conversation, used to highlight the transcript in LeftPanel
+        // Set state back to Encounter, used to highlight the transcript in LeftPanel
         const newHighlightId = {
             allSegmentIds: EvidenceLinks.map((i) => i.SegmentId),
             selectedSegmentId: id,

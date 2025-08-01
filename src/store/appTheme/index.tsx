@@ -16,7 +16,7 @@ type AppThemeContextType = {
 
 const DEFAULT_APP_THEME = {
     color: 'appTheme.light',
-    density: 'density.comfortable',
+    density: 'density.compact',
 };
 
 export const AppThemeContext = createContext<AppThemeContextType>({

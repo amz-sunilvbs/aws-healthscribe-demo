@@ -1,25 +1,75 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
-import React from 'react';
+import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import SideNavigation from '@cloudscape-design/components/side-navigation';
 import { SideNavigationProps } from '@cloudscape-design/components/side-navigation';
+import { Density, Mode, applyDensity, applyMode } from '@cloudscape-design/global-styles';
+
+import ModalLoader from '@/components/SuspenseLoader/ModalLoader';
+import { useAppThemeContext } from '@/store/appTheme';
+import { useAuthContext } from '@/store/auth';
+
+const Auth = lazy(() => import('@/components/Auth'));
 
 export default function SideNav() {
     const location = useLocation();
     const navigate = useNavigate();
+    const { isUserAuthenticated, user, signOut } = useAuthContext();
+    const { appTheme, setAppThemeColor, setAppThemeDensity } = useAppThemeContext();
+    const [authVisible, setAuthVisible] = useState(false);
+    const themeSetRef = useRef(false);
+
+    // Set default theme to Light and Compact when user logs in (only once)
+    useEffect(() => {
+        if (isUserAuthenticated && !themeSetRef.current) {
+            setAppThemeColor('appTheme.light');
+            setAppThemeDensity('density.compact');
+            themeSetRef.current = true;
+        }
+        if (!isUserAuthenticated) {
+            themeSetRef.current = false;
+        }
+    }, [isUserAuthenticated]); // Remove the function dependencies
+
+    // Apply theme changes
+    useEffect(() => {
+        if (appTheme.color === 'appTheme.light') {
+            applyMode(Mode.Light);
+        } else if (appTheme.color === 'appTheme.dark') {
+            applyMode(Mode.Dark);
+        }
+
+        if (appTheme.density === 'density.comfortable') {
+            applyDensity(Density.Comfortable);
+        } else if (appTheme.density === 'density.compact') {
+            applyDensity(Density.Compact);
+        }
+    }, [appTheme]);
+
+    // Close auth modal when user authenticates
+    useEffect(() => {
+        if (isUserAuthenticated) {
+            setAuthVisible(false);
+        }
+    }, [isUserAuthenticated]);
 
     const sideNavItems: SideNavigationProps.Item[] = [
         {
             type: 'link',
-            text: 'Conversations',
+            text: 'New Encounter',
+            href: '/',
+        },
+        {
+            type: 'link',
+            text: 'Encounters',
             href: '/conversations',
         },
         {
             type: 'link',
-            text: 'New Conversation',
+            text: 'File Upload',
             href: '/new',
         },
         { type: 'divider' },
@@ -35,39 +85,59 @@ export default function SideNav() {
             href: '/settings',
         },
         { type: 'divider' },
-        {
-            type: 'link',
-            text: 'AWS HealthScribe',
-            href: 'https://aws.amazon.com/healthscribe',
-            external: true,
-        },
-        {
-            type: 'link',
-            text: 'AWS for Health',
-            href: 'https://aws.amazon.com/health',
-            external: true,
-        },
-        {
-            type: 'link',
-            text: 'Amazon Web Services',
-            href: 'https://aws.amazon.com',
-            external: true,
-        },
+        ...(isUserAuthenticated
+            ? [
+                  {
+                      type: 'link' as const,
+                      text: 'Sign Out',
+                      href: '#signout',
+                  },
+              ]
+            : [
+                  {
+                      type: 'link' as const,
+                      text: 'Sign In',
+                      href: '#signin',
+                  },
+              ]),
     ];
 
     return (
-        <SideNavigation
-            activeHref={`/${location.pathname.split('/')[1]}`}
-            header={{ text: 'AWS HealthScribe', href: '/' }}
-            items={sideNavItems}
-            onFollow={(e) => {
-                e.preventDefault();
-                if (e.detail.external === true) {
-                    window.open(e.detail.href, '_blank', 'noopener');
-                    return;
-                }
-                navigate(e.detail.href, { relative: 'route' });
-            }}
-        />
+        <>
+            {authVisible && (
+                <Suspense fallback={<ModalLoader />}>
+                    <Auth setVisible={setAuthVisible} />
+                </Suspense>
+            )}
+            <SideNavigation
+                activeHref={`/${location.pathname.split('/')[1]}`}
+                header={{ text: 'Naina HealthScribe', href: '/' }}
+                items={sideNavItems}
+                onFollow={(e) => {
+                    e.preventDefault();
+                    
+                    const href = e.detail.href;
+                    
+                    // Handle authentication
+                    if (href === '#signin') {
+                        setAuthVisible(true);
+                        return;
+                    }
+                    
+                    if (href === '#signout') {
+                        signOut();
+                        return;
+                    }
+                    
+                    // Handle regular navigation - don't ignore non-hash links
+                    if (!href.startsWith('#')) {
+                        navigate(href);
+                        return;
+                    }
+                    
+                    // Ignore other hash links
+                }}
+            />
+        </>
     );
 }

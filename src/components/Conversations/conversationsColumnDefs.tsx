@@ -19,7 +19,7 @@ function JobName(healthScribeJob: MedicalScribeJobSummary) {
     if (healthScribeJob.MedicalScribeJobStatus === 'COMPLETED') {
         return (
             <TextContent>
-                <Link to={`/conversation/${healthScribeJob.MedicalScribeJobName}`}>
+                <Link to={`/encounter/${healthScribeJob.MedicalScribeJobName}`}>
                     {healthScribeJob.MedicalScribeJobName}
                 </Link>
             </TextContent>

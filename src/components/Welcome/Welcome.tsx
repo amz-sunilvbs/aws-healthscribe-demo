@@ -7,10 +7,11 @@ import ContentLayout from '@cloudscape-design/components/content-layout';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 
 import { useAuthContext } from '@/store/auth';
+import TopBanner from '@/components/TopBanner';
 
 import styles from './Welcome.module.css';
 import WelcomeHeader from './WelcomeHeader';
-import { Details, Footer, Highlights, Overview } from './WelcomeSections';
+import { Details, Highlights, Overview } from './WelcomeSections';
 
 function Welcome() {
     const { isUserAuthenticated } = useAuthContext();
@@ -28,7 +29,6 @@ function Welcome() {
                     <Overview />
                     <Highlights />
                     <Details />
-                    <Footer />
                 </SpaceBetween>
             </main>
         </ContentLayout>

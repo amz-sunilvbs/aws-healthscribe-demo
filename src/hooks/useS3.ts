@@ -1,13 +1,14 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
 import uuid4 from 'uuid4';
-
-import config from '@/amplifyconfiguration.json';
+import { getAmplifyConfig } from '@/config/amplifyConfig';
 
 export function useS3() {
     const uploadKeyPrefix = 'uploads/HealthScribeDemo/';
 
-    const bucketName = config.aws_user_files_s3_bucket;
+    const config = getAmplifyConfig();
+    const bucketName = config?.aws_user_files_s3_bucket || '';
+    
     function getUploadMetadata() {
         return {
             bucket: bucketName,

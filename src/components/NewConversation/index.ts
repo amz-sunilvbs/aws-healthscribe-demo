@@ -1,3 +1,3 @@
-import NewConversation from './NewConversation';
+import NewEncounter from './NewConversation';
 
-export default NewConversation;
+export default NewEncounter;

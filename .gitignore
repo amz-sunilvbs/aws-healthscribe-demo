@@ -29,6 +29,8 @@ dist-ssr
 .env.production.local
 /*toolbag
 /.*Agent
+*.txt
+*.zip
 
 # VSCode
 .vscode
@@ -71,3 +73,6 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
+
+# Local development environment variables
+.env.local

@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: MIT-0
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import Button from '@cloudscape-design/components/button';
 import Container from '@cloudscape-design/components/container';
 import ContentLayout from '@cloudscape-design/components/content-layout';
 import Form from '@cloudscape-design/components/form';
 import FormField from '@cloudscape-design/components/form-field';
+import Grid from '@cloudscape-design/components/grid';
 import Header from '@cloudscape-design/components/header';
 import RadioGroup from '@cloudscape-design/components/radio-group';
 import SpaceBetween from '@cloudscape-design/components/space-between';
@@ -25,12 +26,13 @@ import { Progress } from '@aws-sdk/lib-storage';
 import dayjs from 'dayjs';
 
 import { useS3 } from '@/hooks/useS3';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useNotificationsContext } from '@/store/notifications';
 import { startMedicalScribeJob } from '@/utils/HealthScribeApi';
 import { fileUpload } from '@/utils/S3Api';
 import sleep from '@/utils/sleep';
+import { getAmplifyConfig } from '@/config/amplifyConfig';
 
-import amplifyCustom from '../../aws-custom.json';
 import AudioRecorder from './AudioRecorder';
 import { AudioDropzone } from './Dropzone';
 import { AudioDetailSettings, AudioIdentificationType, InputName, NoteType } from './FormComponents';
@@ -38,14 +40,28 @@ import styles from './NewConversation.module.css';
 import { verifyJobParams } from './formUtils';
 import { AudioDetails, AudioSelection } from './types';
 
-export default function NewConversation() {
+export default function NewEncounter() {
     const { updateProgressBar } = useNotificationsContext();
+    const { preferences } = useUserPreferences();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Get initial values from location state (passed from Welcome page)
+    const locationState = location.state as {
+        patientName?: string;
+        noteType?: string;
+        notes?: string;
+        uploadMode?: boolean;
+    } | null;
 
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // is job submitting
     const [formError, setFormError] = useState<string | React.ReactElement[]>('');
-    const [jobName, setJobName] = useState<string>(''); // form - job name
-    const [noteType, setNoteType] = useState<MedicalScribeNoteTemplate>('HISTORY_AND_PHYSICAL'); // form - note type
+    const [jobName, setJobName] = useState<string>(locationState?.patientName || ''); // form - job name
+    const [noteType, setNoteType] = useState<MedicalScribeNoteTemplate>(
+        (locationState?.noteType as MedicalScribeNoteTemplate) || 
+        (preferences.defaultNoteTemplate as MedicalScribeNoteTemplate) || 
+        'HISTORY_AND_PHYSICAL'
+    ); // form - note type
     const [audioSelection, setAudioSelection] = useState<AudioSelection>('speakerPartitioning'); // form - audio selection
     // form - audio details
     const [audioDetails, setAudioDetails] = useState<AudioDetails>({
@@ -59,8 +75,17 @@ export default function NewConversation() {
     const [filePath, setFilePath] = useState<File>(); // only one file is allowed from react-dropzone. NOT an array
     const [outputBucket, getUploadMetadata] = useS3(); // outputBucket is the Amplify bucket, and uploadMetadata contains uuid4
 
-    const [submissionMode, setSubmissionMode] = useState<string>('uploadAudio'); // to hide or show the live recorder
+    const [submissionMode, setSubmissionMode] = useState<string>(
+        locationState?.uploadMode ? 'uploadAudio' : 'uploadAudio'
+    ); // to hide or show the live recorder
     const [recordedAudio, setRecordedAudio] = useState<File | undefined>(); // audio file recorded via live recorder
+
+    // Initialize submission mode based on location state
+    useEffect(() => {
+        if (locationState?.uploadMode) {
+            setSubmissionMode('uploadAudio');
+        }
+    }, [locationState]);
 
     // Set array for TokenGroup items
     const fileToken = useMemo(() => {
@@ -143,7 +168,7 @@ export default function NewConversation() {
 
         const jobParams: StartMedicalScribeJobRequest = {
             MedicalScribeJobName: jobName,
-            DataAccessRoleArn: amplifyCustom.healthScribeServiceRole,
+            DataAccessRoleArn: getAmplifyConfig()?.healthscribe_service_role_arn || '',
             OutputBucketName: outputBucket,
             Media: {
                 MediaFileUri: `s3://${s3Location.Bucket}/${s3Location.Key}`,
@@ -197,7 +222,7 @@ export default function NewConversation() {
                     description: 'HealthScribe job submitted',
                     additionalInfo: `Audio file successfully uploaded to S3 and submitted to HealthScribe at ${dayjs(
                         startJob.MedicalScribeJob.StartTime
-                    ).format('MM/DD/YYYY hh:mm A')}. Redirecting to conversation list in 5 seconds.`,
+                    ).format('MM/DD/YYYY hh:mm A')}. Redirecting to encounter list in 5 seconds.`,
                 });
                 await sleep(5000);
                 navigate('/conversations');
@@ -234,21 +259,14 @@ export default function NewConversation() {
             headerVariant={'high-contrast'}
             header={
                 <Header
-                    description="Upload your audio file to be processed by AWS HealthScribe"
+                    description="Upload your audio file to be processed by Naina HealthScribe"
                     variant="awsui-h1-sticky"
                 >
-                    New Conversation
+                    Upload Audio File
                 </Header>
             }
         >
-            <Container
-                header={
-                    <Header
-                        variant="h3"
-                        description="Note: AWS HealthScribe offers additional features not built into this demo, such as Custom Vocabulary, Content Removal, and more. This is available via the AWS console, API, or SDK."
-                    />
-                }
-            >
+            <Container>
                 <form onSubmit={(e) => submitJob(e)}>
                     <Form
                         errorText={formError}
@@ -267,56 +285,32 @@ export default function NewConversation() {
                         }
                     >
                         <SpaceBetween direction="vertical" size="xl">
-                            <InputName jobName={jobName} setJobName={setJobName} />
-                            <NoteType noteType={noteType} setNoteType={setNoteType} />
-                            <AudioIdentificationType
-                                audioSelection={audioSelection}
-                                setAudioSelection={setAudioSelection}
-                            />
-                            <AudioDetailSettings
-                                audioSelection={audioSelection}
-                                audioDetails={audioDetails}
-                                setAudioDetails={setAudioDetails}
-                            />
-                            <FormField label="Audio source">
-                                <SpaceBetween direction="vertical" size="xl">
-                                    <div className={styles.submissionModeRadio}>
-                                        <RadioGroup
-                                            ariaLabel="submissionMode"
-                                            onChange={({ detail }) => setSubmissionMode(detail.value)}
-                                            value={submissionMode}
-                                            items={[
-                                                { value: 'uploadAudio', label: 'Upload Audio' },
-                                                { value: 'liveRecording', label: 'Live Record' },
-                                            ]}
-                                        />
-                                    </div>
-                                    {submissionMode === 'liveRecording' ? (
-                                        <>
-                                            <FormField
-                                                label="Record"
-                                                description="The audio file will be submitted to AWS HealthScribe after the recording is complete. Please position your device or microphone so it can capture all conversation participants."
-                                            ></FormField>
-                                            <AudioRecorder setRecordedAudio={setRecordedAudio} />
-                                        </>
-                                    ) : (
-                                        <FormField label="Select Files">
-                                            <AudioDropzone setFilePath={setFilePath} setFormError={setFormError} />
-                                            <TokenGroup
-                                                i18nStrings={{
-                                                    limitShowFewer: 'Show fewer files',
-                                                    limitShowMore: 'Show more files',
-                                                }}
-                                                onDismiss={() => {
-                                                    setFilePath(undefined);
-                                                }}
-                                                items={fileToken ? [fileToken] : []}
-                                                alignment="vertical"
-                                                limit={1}
-                                            />
-                                        </FormField>
-                                    )}
-                                </SpaceBetween>
+                            {/* Patient Name and Note Type in one row */}
+                            <Grid gridDefinition={[
+                                { colspan: { default: 12, xs: 6, s: 6, m: 6, l: 6 } },
+                                { colspan: { default: 12, xs: 6, s: 6, m: 6, l: 6 } }
+                            ]}>
+                                <InputName jobName={jobName} setJobName={setJobName} />
+                                <NoteType noteType={noteType} setNoteType={setNoteType} />
+                            </Grid>
+
+                            {/* File Upload Section */}
+                            <FormField label="Select Files">
+                                <div style={{ width: '100%' }}>
+                                    <AudioDropzone setFilePath={setFilePath} setFormError={setFormError} />
+                                </div>
+                                <TokenGroup
+                                    i18nStrings={{
+                                        limitShowFewer: 'Show fewer files',
+                                        limitShowMore: 'Show more files',
+                                    }}
+                                    onDismiss={() => {
+                                        setFilePath(undefined);
+                                    }}
+                                    items={fileToken ? [fileToken] : []}
+                                    alignment="vertical"
+                                    limit={1}
+                                />
                             </FormField>
                         </SpaceBetween>
                     </Form>

@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+import { useLocation } from 'react-router-dom';
 
 import Button from '@cloudscape-design/components/button';
 import ButtonDropdown from '@cloudscape-design/components/button-dropdown';
@@ -35,8 +37,21 @@ const PROGRESS_BAR_ID = 'Generating audio file';
 
 export default function GenerateAudio() {
     const { addFlashMessage, updateProgressBar } = useNotificationsContext();
+    const location = useLocation();
 
-    const [audioLines, setAudioLines] = useState<AudioLines>(DEFAULT_AUDIOLINES);
+    // Get initial values from location state (passed from Welcome page)
+    const locationState = location.state as {
+        patientName?: string;
+        noteType?: string;
+        notes?: string;
+    } | null;
+
+    // Initialize with notes from Welcome page if available
+    const initialAudioLines = locationState?.notes 
+        ? [{ id: 1, speaker: { label: 'Doctor', value: 'Joanna' }, text: locationState.notes }]
+        : DEFAULT_AUDIOLINES;
+
+    const [audioLines, setAudioLines] = useState<AudioLines>(initialAudioLines);
     const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
     /**
@@ -164,7 +179,7 @@ export default function GenerateAudio() {
             description: 'Audio generation using Amazon Polly in progress...',
         });
         try {
-            const conversationAudio: AudioBuffer[] = [];
+            const encounterAudio: AudioBuffer[] = [];
             for (const [ind, audioLine] of audioLines.entries()) {
                 const getAudioInput = {
                     voiceId: audioLine.speaker?.value,
@@ -173,7 +188,7 @@ export default function GenerateAudio() {
                 const pollyAudioBlob = await getAudioBlobFromPolly(getAudioInput as PollyPhrase);
                 const pollyAudioBuffer = await crunker.fetchAudio(pollyAudioBlob);
                 const paddedPollyAudioBuffer = crunker.padAudio(pollyAudioBuffer[0], undefined, 0.5);
-                conversationAudio.push(paddedPollyAudioBuffer);
+                encounterAudio.push(paddedPollyAudioBuffer);
                 const percentDone = Math.round(((ind + 1) / audioLines.length) * 100);
                 updateProgressBar({
                     id: PROGRESS_BAR_ID,
@@ -181,7 +196,7 @@ export default function GenerateAudio() {
                     description: `Generated audio part ${ind + 1} of ${audioLines.length}`,
                 });
             }
-            const concatAudio = crunker.concatAudio(conversationAudio);
+            const concatAudio = crunker.concatAudio(encounterAudio);
             const exportedAudio = crunker.export(concatAudio, 'audio/mp3');
 
             const link = document.createElement('a');

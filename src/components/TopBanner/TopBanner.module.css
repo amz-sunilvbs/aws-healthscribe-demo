@@ -1,0 +1,91 @@
+/* Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved. */
+/* SPDX-License-Identifier: MIT-0 */
+
+.waveformContainer {
+    background-color: #f8f9fa;
+    border: 2px solid #e1e4e8;
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.waveform {
+    width: 100%;
+    min-height: 60px;
+    background-color: transparent;
+}
+
+/* Ensure the waveform canvas is visible */
+.waveform canvas {
+    width: 100% !important;
+    height: 60px !important;
+}
+
+.recordingStatus {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.recordingIndicator {
+    width: 10px;
+    height: 10px;
+    background-color: #d13212;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+}
+
+.duration {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    color: #232f3e;
+}
+
+.formSection {
+    background-color: #ffffff;
+    border: 1px solid #e1e4e8;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.submitButton {
+    margin-top: 16px;
+}
+
+.recordingComplete {
+    color: #037f0c;
+    font-weight: 600;
+}
+
+.recordingInProgress {
+    color: #d13212;
+    font-weight: 600;
+}
+
+/* Placeholder text when not recording */
+.waveformPlaceholder {
+    color: #687078;
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}

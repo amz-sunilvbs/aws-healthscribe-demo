@@ -9,13 +9,13 @@ import SpaceBetween from '@cloudscape-design/components/space-between';
 
 import { MedicalScribeJobSummary } from '@aws-sdk/client-transcribe';
 
-import { DeleteConversation } from './DeleteConversation';
+import { DeleteEncounter } from './DeleteConversation';
 
 type TableHeaderActionsProps = {
     selectedHealthScribeJob: MedicalScribeJobSummary[];
     refreshTable: () => void;
 };
-export function ConversationsHeaderActions({ selectedHealthScribeJob, refreshTable }: TableHeaderActionsProps) {
+export function EncountersHeaderActions({ selectedHealthScribeJob, refreshTable }: TableHeaderActionsProps) {
     const navigate = useNavigate();
 
     const [deleteModalActive, setDeleteModalActive] = useState<boolean>(false);
@@ -30,7 +30,7 @@ export function ConversationsHeaderActions({ selectedHealthScribeJob, refreshTab
 
     return (
         <>
-            <DeleteConversation
+            <DeleteEncounter
                 selectedHealthScribeJob={selectedHealthScribeJob}
                 deleteModalActive={deleteModalActive}
                 setDeleteModalActive={setDeleteModalActive}
@@ -47,6 +47,12 @@ export function ConversationsHeaderActions({ selectedHealthScribeJob, refreshTab
                     onClick={() => navigate(`/conversation/${selectedHealthScribeJob[0].MedicalScribeJobName}`)}
                 >
                     View
+                </Button>
+                <Button
+                    variant={'primary'}
+                    onClick={() => navigate('/')}
+                >
+                    New Encounter
                 </Button>
             </SpaceBetween>
         </>

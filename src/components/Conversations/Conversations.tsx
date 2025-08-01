@@ -17,7 +17,7 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useNotificationsContext } from '@/store/notifications';
 import { ListHealthScribeJobsProps, listHealthScribeJobs } from '@/utils/HealthScribeApi';
 
-import { ConversationsHeaderActions } from './ConversationsHeaderActions';
+import { EncountersHeaderActions } from './ConversationsHeaderActions';
 import TableEmptyState from './TableEmptyState';
 import { TablePreferences } from './TablePreferences';
 import { columnDefs } from './conversationsColumnDefs';
@@ -38,9 +38,9 @@ export default function Conversations() {
     const [tableLoading, setTableLoading] = useState(false); // Loading state for table
 
     const [preferences, setPreferences] = useLocalStorage<CollectionPreferencesProps.Preferences>(
-        'Conversations-Table-Preferences',
+        'Encounters-Table-Preferences',
         DEFAULT_PREFERENCES
-    ); // Conversation table preferences
+    ); // Encounter table preferences
 
     const [searchParams, setSearchParams] = useState<ListHealthScribeJobsProps>({});
 
@@ -87,7 +87,7 @@ export default function Conversations() {
             setTableLoading(false);
             addFlashMessage({
                 id: e?.toString() || 'ListHealthScribeJobs error',
-                header: 'Conversations Error',
+                header: 'Encounters Error',
                 content: e?.toString() || 'ListHealthScribeJobs error',
                 type: 'error',
             });
@@ -126,7 +126,7 @@ export default function Conversations() {
         selection: {},
     });
 
-    // List conversations initially
+    // List encounters initially
     useEffect(() => {
         void refreshTable();
     }, []);
@@ -137,16 +137,16 @@ export default function Conversations() {
             header={
                 <Header
                     variant="awsui-h1-sticky"
-                    description="View existing AWS HealthScribe conversations"
+                    description="View existing Naina HealthScribe encounters"
                     counter={headerCounterText}
                     actions={
-                        <ConversationsHeaderActions
+                        <EncountersHeaderActions
                             selectedHealthScribeJob={selectedHealthScribeJob}
                             refreshTable={refreshTable}
                         />
                     }
                 >
-                    Conversations
+                    Encounters
                 </Header>
             }
         >

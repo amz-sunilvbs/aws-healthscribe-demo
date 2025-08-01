@@ -12,6 +12,7 @@ import { Authenticator } from '@aws-amplify/ui-react';
 import ReactDOM from 'react-dom/client';
 import { Toaster } from 'react-hot-toast';
 
+import { ConfigLoader } from '@/components/ConfigLoader/ConfigLoader';
 import AppSettingsContextProvider from '@/store/appSettings';
 import AppThemeContextProvider from '@/store/appTheme';
 import AuthContextProvider from '@/store/auth';
@@ -27,20 +28,22 @@ root.render(
     <React.StrictMode>
         <BrowserRouter>
             <I18nProvider locale={locale} messages={messages}>
-                <Authenticator.Provider>
-                    <AuthContextProvider>
-                        <AppThemeContextProvider>
-                            <AppSettingsContextProvider>
-                                <NotificationsContextProvider>
-                                    <App />
-                                    <Box>
-                                        <Toaster position="bottom-left" reverseOrder={false} />
-                                    </Box>
-                                </NotificationsContextProvider>
-                            </AppSettingsContextProvider>
-                        </AppThemeContextProvider>
-                    </AuthContextProvider>
-                </Authenticator.Provider>
+                <ConfigLoader>
+                    <Authenticator.Provider>
+                        <AuthContextProvider>
+                            <AppThemeContextProvider>
+                                <AppSettingsContextProvider>
+                                    <NotificationsContextProvider>
+                                        <App />
+                                        <Box>
+                                            <Toaster position="bottom-left" reverseOrder={false} />
+                                        </Box>
+                                    </NotificationsContextProvider>
+                                </AppSettingsContextProvider>
+                            </AppThemeContextProvider>
+                        </AuthContextProvider>
+                    </Authenticator.Provider>
+                </ConfigLoader>
             </I18nProvider>
         </BrowserRouter>
     </React.StrictMode>
