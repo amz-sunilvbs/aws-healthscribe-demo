@@ -1,0 +1,2906 @@
+{
+  "version": "tree-0.1",
+  "tree": {
+    "id": "App",
+    "path": "",
+    "children": {
+      "HealthScribeFullStack-dev": {
+        "id": "HealthScribeFullStack-dev",
+        "path": "HealthScribeFullStack-dev",
+        "children": {
+          "UserPool": {
+            "id": "UserPool",
+            "path": "HealthScribeFullStack-dev/UserPool",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/UserPool/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Cognito::UserPool",
+                  "aws:cdk:cloudformation:props": {
+                    "accountRecoverySetting": {
+                      "recoveryMechanisms": [
+                        {
+                          "name": "verified_email",
+                          "priority": 1
+                        }
+                      ]
+                    },
+                    "adminCreateUserConfig": {
+                      "allowAdminCreateUserOnly": false
+                    },
+                    "autoVerifiedAttributes": [
+                      "email"
+                    ],
+                    "emailVerificationMessage": "The verification code to your new account is {####}",
+                    "emailVerificationSubject": "Verify your new account",
+                    "policies": {
+                      "passwordPolicy": {
+                        "minimumLength": 8,
+                        "requireLowercase": true,
+                        "requireUppercase": true,
+                        "requireNumbers": true,
+                        "requireSymbols": false
+                      }
+                    },
+                    "schema": [
+                      {
+                        "name": "email",
+                        "mutable": true,
+                        "required": true
+                      }
+                    ],
+                    "smsVerificationMessage": "The verification code to your new account is {####}",
+                    "usernameAttributes": [
+                      "email"
+                    ],
+                    "userPoolName": "HealthScribeUserPool-HealthScribeFullStack-dev",
+                    "verificationMessageTemplate": {
+                      "defaultEmailOption": "CONFIRM_WITH_CODE",
+                      "emailMessage": "The verification code to your new account is {####}",
+                      "emailSubject": "Verify your new account",
+                      "smsMessage": "The verification code to your new account is {####}"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_cognito.CfnUserPool",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_cognito.UserPool",
+              "version": "2.87.0"
+            }
+          },
+          "UserPoolClient": {
+            "id": "UserPoolClient",
+            "path": "HealthScribeFullStack-dev/UserPoolClient",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/UserPoolClient/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Cognito::UserPoolClient",
+                  "aws:cdk:cloudformation:props": {
+                    "userPoolId": {
+                      "Ref": "UserPool6BA7E5F2"
+                    },
+                    "allowedOAuthFlows": [
+                      "implicit",
+                      "code"
+                    ],
+                    "allowedOAuthFlowsUserPoolClient": true,
+                    "allowedOAuthScopes": [
+                      "profile",
+                      "phone",
+                      "email",
+                      "openid",
+                      "aws.cognito.signin.user.admin"
+                    ],
+                    "callbackUrLs": [
+                      "https://example.com"
+                    ],
+                    "clientName": "HealthScribeUserPoolClient-HealthScribeFullStack-dev",
+                    "explicitAuthFlows": [
+                      "ALLOW_USER_PASSWORD_AUTH",
+                      "ALLOW_USER_SRP_AUTH",
+                      "ALLOW_REFRESH_TOKEN_AUTH"
+                    ],
+                    "generateSecret": false,
+                    "supportedIdentityProviders": [
+                      "COGNITO"
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_cognito.CfnUserPoolClient",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_cognito.UserPoolClient",
+              "version": "2.87.0"
+            }
+          },
+          "IdentityPool": {
+            "id": "IdentityPool",
+            "path": "HealthScribeFullStack-dev/IdentityPool",
+            "attributes": {
+              "aws:cdk:cloudformation:type": "AWS::Cognito::IdentityPool",
+              "aws:cdk:cloudformation:props": {
+                "allowUnauthenticatedIdentities": false,
+                "cognitoIdentityProviders": [
+                  {
+                    "clientId": {
+                      "Ref": "UserPoolClient2F5918F7"
+                    },
+                    "providerName": {
+                      "Fn::GetAtt": [
+                        "UserPool6BA7E5F2",
+                        "ProviderName"
+                      ]
+                    }
+                  }
+                ],
+                "identityPoolName": "HealthScribeIdentityPool-HealthScribeFullStack-dev"
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_cognito.CfnIdentityPool",
+              "version": "2.87.0"
+            }
+          },
+          "UserPreferencesTable": {
+            "id": "UserPreferencesTable",
+            "path": "HealthScribeFullStack-dev/UserPreferencesTable",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/UserPreferencesTable/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::DynamoDB::Table",
+                  "aws:cdk:cloudformation:props": {
+                    "keySchema": [
+                      {
+                        "attributeName": "PK",
+                        "keyType": "HASH"
+                      },
+                      {
+                        "attributeName": "SK",
+                        "keyType": "RANGE"
+                      }
+                    ],
+                    "attributeDefinitions": [
+                      {
+                        "attributeName": "PK",
+                        "attributeType": "S"
+                      },
+                      {
+                        "attributeName": "SK",
+                        "attributeType": "S"
+                      }
+                    ],
+                    "billingMode": "PAY_PER_REQUEST",
+                    "pointInTimeRecoverySpecification": {
+                      "pointInTimeRecoveryEnabled": true
+                    },
+                    "sseSpecification": {
+                      "sseEnabled": true
+                    },
+                    "tableName": "UserPreferences-HealthScribeFullStack-dev"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_dynamodb.CfnTable",
+                  "version": "2.87.0"
+                }
+              },
+              "ScalingRole": {
+                "id": "ScalingRole",
+                "path": "HealthScribeFullStack-dev/UserPreferencesTable/ScalingRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_dynamodb.Table",
+              "version": "2.87.0"
+            }
+          },
+          "PatientsTable": {
+            "id": "PatientsTable",
+            "path": "HealthScribeFullStack-dev/PatientsTable",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/PatientsTable/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::DynamoDB::Table",
+                  "aws:cdk:cloudformation:props": {
+                    "keySchema": [
+                      {
+                        "attributeName": "patientId",
+                        "keyType": "HASH"
+                      }
+                    ],
+                    "attributeDefinitions": [
+                      {
+                        "attributeName": "patientId",
+                        "attributeType": "S"
+                      },
+                      {
+                        "attributeName": "providerId",
+                        "attributeType": "S"
+                      },
+                      {
+                        "attributeName": "patientName",
+                        "attributeType": "S"
+                      },
+                      {
+                        "attributeName": "lastEncounterDate",
+                        "attributeType": "S"
+                      }
+                    ],
+                    "billingMode": "PAY_PER_REQUEST",
+                    "globalSecondaryIndexes": [
+                      {
+                        "indexName": "providerId-patientName-index",
+                        "keySchema": [
+                          {
+                            "attributeName": "providerId",
+                            "keyType": "HASH"
+                          },
+                          {
+                            "attributeName": "patientName",
+                            "keyType": "RANGE"
+                          }
+                        ],
+                        "projection": {
+                          "projectionType": "ALL"
+                        }
+                      },
+                      {
+                        "indexName": "providerId-lastEncounterDate-index",
+                        "keySchema": [
+                          {
+                            "attributeName": "providerId",
+                            "keyType": "HASH"
+                          },
+                          {
+                            "attributeName": "lastEncounterDate",
+                            "keyType": "RANGE"
+                          }
+                        ],
+                        "projection": {
+                          "projectionType": "ALL"
+                        }
+                      }
+                    ],
+                    "pointInTimeRecoverySpecification": {
+                      "pointInTimeRecoveryEnabled": true
+                    },
+                    "sseSpecification": {
+                      "sseEnabled": true
+                    },
+                    "tableName": "NainaHealthScribe-Patients-HealthScribeFullStack-dev"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_dynamodb.CfnTable",
+                  "version": "2.87.0"
+                }
+              },
+              "ScalingRole": {
+                "id": "ScalingRole",
+                "path": "HealthScribeFullStack-dev/PatientsTable/ScalingRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_dynamodb.Table",
+              "version": "2.87.0"
+            }
+          },
+          "UserPreferencesFunction": {
+            "id": "UserPreferencesFunction",
+            "path": "HealthScribeFullStack-dev/UserPreferencesFunction",
+            "children": {
+              "ServiceRole": {
+                "id": "ServiceRole",
+                "path": "HealthScribeFullStack-dev/UserPreferencesFunction/ServiceRole",
+                "children": {
+                  "ImportServiceRole": {
+                    "id": "ImportServiceRole",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesFunction/ServiceRole/ImportServiceRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesFunction/ServiceRole/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                              ]
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "DefaultPolicy": {
+                    "id": "DefaultPolicy",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesFunction/ServiceRole/DefaultPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "HealthScribeFullStack-dev/UserPreferencesFunction/ServiceRole/DefaultPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": [
+                                    "dynamodb:BatchGetItem",
+                                    "dynamodb:BatchWriteItem",
+                                    "dynamodb:ConditionCheckItem",
+                                    "dynamodb:DeleteItem",
+                                    "dynamodb:DescribeTable",
+                                    "dynamodb:GetItem",
+                                    "dynamodb:GetRecords",
+                                    "dynamodb:GetShardIterator",
+                                    "dynamodb:PutItem",
+                                    "dynamodb:Query",
+                                    "dynamodb:Scan",
+                                    "dynamodb:UpdateItem"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "PatientsTable087EEB9B",
+                                        "Arn"
+                                      ]
+                                    },
+                                    {
+                                      "Fn::GetAtt": [
+                                        "UserPreferencesTableA0B50479",
+                                        "Arn"
+                                      ]
+                                    },
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          {
+                                            "Fn::GetAtt": [
+                                              "PatientsTable087EEB9B",
+                                              "Arn"
+                                            ]
+                                          },
+                                          "/index/*"
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "Ref": "AWS::NoValue"
+                                    }
+                                  ]
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "UserPreferencesFunctionServiceRoleDefaultPolicy8500D257",
+                            "roles": [
+                              {
+                                "Ref": "UserPreferencesFunctionServiceRoleAC07CD09"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                          "version": "2.87.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Policy",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.87.0"
+                }
+              },
+              "Code": {
+                "id": "Code",
+                "path": "HealthScribeFullStack-dev/UserPreferencesFunction/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesFunction/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesFunction/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.87.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/UserPreferencesFunction/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": "cdk-hnb659fds-assets-085226951177-us-east-1",
+                      "s3Key": "3c74b21adf9998b101aca672b83f3028f4cc0be20b11ff5e27e8845741df69c3.zip"
+                    },
+                    "role": {
+                      "Fn::GetAtt": [
+                        "UserPreferencesFunctionServiceRoleAC07CD09",
+                        "Arn"
+                      ]
+                    },
+                    "environment": {
+                      "variables": {
+                        "USER_PREFERENCES_TABLE_NAME": {
+                          "Ref": "UserPreferencesTableA0B50479"
+                        },
+                        "PATIENTS_TABLE_NAME": {
+                          "Ref": "PatientsTable087EEB9B"
+                        },
+                        "REGION": "us-east-1"
+                      }
+                    },
+                    "functionName": "UserPreferencesApi-HealthScribeFullStack-dev",
+                    "handler": "index.handler",
+                    "memorySize": 256,
+                    "runtime": "nodejs18.x",
+                    "timeout": 30
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.87.0"
+            }
+          },
+          "UserPreferencesApi": {
+            "id": "UserPreferencesApi",
+            "path": "HealthScribeFullStack-dev/UserPreferencesApi",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::RestApi",
+                  "aws:cdk:cloudformation:props": {
+                    "description": "API for user preferences management",
+                    "name": "UserPreferencesApi-HealthScribeFullStack-dev"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigateway.CfnRestApi",
+                  "version": "2.87.0"
+                }
+              },
+              "CloudWatchRole": {
+                "id": "CloudWatchRole",
+                "path": "HealthScribeFullStack-dev/UserPreferencesApi/CloudWatchRole",
+                "children": {
+                  "ImportCloudWatchRole": {
+                    "id": "ImportCloudWatchRole",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesApi/CloudWatchRole/ImportCloudWatchRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesApi/CloudWatchRole/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "apigateway.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+                              ]
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.87.0"
+                }
+              },
+              "Account": {
+                "id": "Account",
+                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Account",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Account",
+                  "aws:cdk:cloudformation:props": {
+                    "cloudWatchRoleArn": {
+                      "Fn::GetAtt": [
+                        "UserPreferencesApiCloudWatchRoleBC82B2D8",
+                        "Arn"
+                      ]
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigateway.CfnAccount",
+                  "version": "2.87.0"
+                }
+              },
+              "Deployment": {
+                "id": "Deployment",
+                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Deployment",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesApi/Deployment/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGateway::Deployment",
+                      "aws:cdk:cloudformation:props": {
+                        "restApiId": {
+                          "Ref": "UserPreferencesApi61334ABA"
+                        },
+                        "description": "API for user preferences management"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigateway.CfnDeployment",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigateway.Deployment",
+                  "version": "2.87.0"
+                }
+              },
+              "DeploymentStage.prod": {
+                "id": "DeploymentStage.prod",
+                "path": "HealthScribeFullStack-dev/UserPreferencesApi/DeploymentStage.prod",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesApi/DeploymentStage.prod/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGateway::Stage",
+                      "aws:cdk:cloudformation:props": {
+                        "restApiId": {
+                          "Ref": "UserPreferencesApi61334ABA"
+                        },
+                        "deploymentId": {
+                          "Ref": "UserPreferencesApiDeploymentA4E206DE3c7346e4abddfac9d2b9991016a42268"
+                        },
+                        "stageName": "prod"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigateway.CfnStage",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigateway.Stage",
+                  "version": "2.87.0"
+                }
+              },
+              "Endpoint": {
+                "id": "Endpoint",
+                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Endpoint",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnOutput",
+                  "version": "2.87.0"
+                }
+              },
+              "Default": {
+                "id": "Default",
+                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default",
+                "children": {
+                  "OPTIONS": {
+                    "id": "OPTIONS",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/OPTIONS",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/OPTIONS/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                          "aws:cdk:cloudformation:props": {
+                            "httpMethod": "OPTIONS",
+                            "resourceId": {
+                              "Fn::GetAtt": [
+                                "UserPreferencesApi61334ABA",
+                                "RootResourceId"
+                              ]
+                            },
+                            "restApiId": {
+                              "Ref": "UserPreferencesApi61334ABA"
+                            },
+                            "apiKeyRequired": false,
+                            "authorizationType": "NONE",
+                            "integration": {
+                              "type": "MOCK",
+                              "requestTemplates": {
+                                "application/json": "{ statusCode: 200 }"
+                              },
+                              "integrationResponses": [
+                                {
+                                  "statusCode": "204",
+                                  "responseParameters": {
+                                    "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                                    "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                    "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+                                  }
+                                }
+                              ]
+                            },
+                            "methodResponses": [
+                              {
+                                "statusCode": "204",
+                                "responseParameters": {
+                                  "method.response.header.Access-Control-Allow-Headers": true,
+                                  "method.response.header.Access-Control-Allow-Origin": true,
+                                  "method.response.header.Access-Control-Allow-Methods": true
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
+                          "version": "2.87.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigateway.Method",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "preferences": {
+                    "id": "preferences",
+                    "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGateway::Resource",
+                          "aws:cdk:cloudformation:props": {
+                            "parentId": {
+                              "Fn::GetAtt": [
+                                "UserPreferencesApi61334ABA",
+                                "RootResourceId"
+                              ]
+                            },
+                            "pathPart": "preferences",
+                            "restApiId": {
+                              "Ref": "UserPreferencesApi61334ABA"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.CfnResource",
+                          "version": "2.87.0"
+                        }
+                      },
+                      "OPTIONS": {
+                        "id": "OPTIONS",
+                        "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/OPTIONS",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/OPTIONS/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                              "aws:cdk:cloudformation:props": {
+                                "httpMethod": "OPTIONS",
+                                "resourceId": {
+                                  "Ref": "UserPreferencesApipreferencesDDA6FAC8"
+                                },
+                                "restApiId": {
+                                  "Ref": "UserPreferencesApi61334ABA"
+                                },
+                                "apiKeyRequired": false,
+                                "authorizationType": "NONE",
+                                "integration": {
+                                  "type": "MOCK",
+                                  "requestTemplates": {
+                                    "application/json": "{ statusCode: 200 }"
+                                  },
+                                  "integrationResponses": [
+                                    {
+                                      "statusCode": "204",
+                                      "responseParameters": {
+                                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+                                      }
+                                    }
+                                  ]
+                                },
+                                "methodResponses": [
+                                  {
+                                    "statusCode": "204",
+                                    "responseParameters": {
+                                      "method.response.header.Access-Control-Allow-Headers": true,
+                                      "method.response.header.Access-Control-Allow-Origin": true,
+                                      "method.response.header.Access-Control-Allow-Methods": true
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
+                              "version": "2.87.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.Method",
+                          "version": "2.87.0"
+                        }
+                      },
+                      "{userId}": {
+                        "id": "{userId}",
+                        "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}",
+                        "children": {
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::ApiGateway::Resource",
+                              "aws:cdk:cloudformation:props": {
+                                "parentId": {
+                                  "Ref": "UserPreferencesApipreferencesDDA6FAC8"
+                                },
+                                "pathPart": "{userId}",
+                                "restApiId": {
+                                  "Ref": "UserPreferencesApi61334ABA"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigateway.CfnResource",
+                              "version": "2.87.0"
+                            }
+                          },
+                          "OPTIONS": {
+                            "id": "OPTIONS",
+                            "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/OPTIONS",
+                            "children": {
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/OPTIONS/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                                  "aws:cdk:cloudformation:props": {
+                                    "httpMethod": "OPTIONS",
+                                    "resourceId": {
+                                      "Ref": "UserPreferencesApipreferencesuserId9CEBDD9C"
+                                    },
+                                    "restApiId": {
+                                      "Ref": "UserPreferencesApi61334ABA"
+                                    },
+                                    "apiKeyRequired": false,
+                                    "authorizationType": "NONE",
+                                    "integration": {
+                                      "type": "MOCK",
+                                      "requestTemplates": {
+                                        "application/json": "{ statusCode: 200 }"
+                                      },
+                                      "integrationResponses": [
+                                        {
+                                          "statusCode": "204",
+                                          "responseParameters": {
+                                            "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                                            "method.response.header.Access-Control-Allow-Origin": "'*'",
+                                            "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+                                          }
+                                        }
+                                      ]
+                                    },
+                                    "methodResponses": [
+                                      {
+                                        "statusCode": "204",
+                                        "responseParameters": {
+                                          "method.response.header.Access-Control-Allow-Headers": true,
+                                          "method.response.header.Access-Control-Allow-Origin": true,
+                                          "method.response.header.Access-Control-Allow-Methods": true
+                                        }
+                                      }
+                                    ]
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
+                                  "version": "2.87.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigateway.Method",
+                              "version": "2.87.0"
+                            }
+                          },
+                          "GET": {
+                            "id": "GET",
+                            "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/GET",
+                            "children": {
+                              "ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.GET..preferences.{userId}": {
+                                "id": "ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.GET..preferences.{userId}",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/GET/ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.GET..preferences.{userId}",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                                  "aws:cdk:cloudformation:props": {
+                                    "action": "lambda:InvokeFunction",
+                                    "functionName": {
+                                      "Fn::GetAtt": [
+                                        "UserPreferencesFunctionE60C62FF",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "principal": "apigateway.amazonaws.com",
+                                    "sourceArn": {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:execute-api:us-east-1:085226951177:",
+                                          {
+                                            "Ref": "UserPreferencesApi61334ABA"
+                                          },
+                                          "/",
+                                          {
+                                            "Ref": "UserPreferencesApiDeploymentStageprodABFDC0FD"
+                                          },
+                                          "/GET/preferences/*"
+                                        ]
+                                      ]
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                                  "version": "2.87.0"
+                                }
+                              },
+                              "ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.GET..preferences.{userId}": {
+                                "id": "ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.GET..preferences.{userId}",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/GET/ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.GET..preferences.{userId}",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                                  "aws:cdk:cloudformation:props": {
+                                    "action": "lambda:InvokeFunction",
+                                    "functionName": {
+                                      "Fn::GetAtt": [
+                                        "UserPreferencesFunctionE60C62FF",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "principal": "apigateway.amazonaws.com",
+                                    "sourceArn": {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:execute-api:us-east-1:085226951177:",
+                                          {
+                                            "Ref": "UserPreferencesApi61334ABA"
+                                          },
+                                          "/test-invoke-stage/GET/preferences/*"
+                                        ]
+                                      ]
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                                  "version": "2.87.0"
+                                }
+                              },
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/GET/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                                  "aws:cdk:cloudformation:props": {
+                                    "httpMethod": "GET",
+                                    "resourceId": {
+                                      "Ref": "UserPreferencesApipreferencesuserId9CEBDD9C"
+                                    },
+                                    "restApiId": {
+                                      "Ref": "UserPreferencesApi61334ABA"
+                                    },
+                                    "authorizationType": "NONE",
+                                    "integration": {
+                                      "type": "AWS_PROXY",
+                                      "uri": {
+                                        "Fn::Join": [
+                                          "",
+                                          [
+                                            "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+                                            {
+                                              "Fn::GetAtt": [
+                                                "UserPreferencesFunctionE60C62FF",
+                                                "Arn"
+                                              ]
+                                            },
+                                            "/invocations"
+                                          ]
+                                        ]
+                                      },
+                                      "integrationHttpMethod": "POST"
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
+                                  "version": "2.87.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigateway.Method",
+                              "version": "2.87.0"
+                            }
+                          },
+                          "PUT": {
+                            "id": "PUT",
+                            "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PUT",
+                            "children": {
+                              "ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PUT..preferences.{userId}": {
+                                "id": "ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PUT..preferences.{userId}",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PUT/ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PUT..preferences.{userId}",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                                  "aws:cdk:cloudformation:props": {
+                                    "action": "lambda:InvokeFunction",
+                                    "functionName": {
+                                      "Fn::GetAtt": [
+                                        "UserPreferencesFunctionE60C62FF",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "principal": "apigateway.amazonaws.com",
+                                    "sourceArn": {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:execute-api:us-east-1:085226951177:",
+                                          {
+                                            "Ref": "UserPreferencesApi61334ABA"
+                                          },
+                                          "/",
+                                          {
+                                            "Ref": "UserPreferencesApiDeploymentStageprodABFDC0FD"
+                                          },
+                                          "/PUT/preferences/*"
+                                        ]
+                                      ]
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                                  "version": "2.87.0"
+                                }
+                              },
+                              "ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PUT..preferences.{userId}": {
+                                "id": "ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PUT..preferences.{userId}",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PUT/ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PUT..preferences.{userId}",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                                  "aws:cdk:cloudformation:props": {
+                                    "action": "lambda:InvokeFunction",
+                                    "functionName": {
+                                      "Fn::GetAtt": [
+                                        "UserPreferencesFunctionE60C62FF",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "principal": "apigateway.amazonaws.com",
+                                    "sourceArn": {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:execute-api:us-east-1:085226951177:",
+                                          {
+                                            "Ref": "UserPreferencesApi61334ABA"
+                                          },
+                                          "/test-invoke-stage/PUT/preferences/*"
+                                        ]
+                                      ]
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                                  "version": "2.87.0"
+                                }
+                              },
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PUT/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                                  "aws:cdk:cloudformation:props": {
+                                    "httpMethod": "PUT",
+                                    "resourceId": {
+                                      "Ref": "UserPreferencesApipreferencesuserId9CEBDD9C"
+                                    },
+                                    "restApiId": {
+                                      "Ref": "UserPreferencesApi61334ABA"
+                                    },
+                                    "authorizationType": "NONE",
+                                    "integration": {
+                                      "type": "AWS_PROXY",
+                                      "uri": {
+                                        "Fn::Join": [
+                                          "",
+                                          [
+                                            "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+                                            {
+                                              "Fn::GetAtt": [
+                                                "UserPreferencesFunctionE60C62FF",
+                                                "Arn"
+                                              ]
+                                            },
+                                            "/invocations"
+                                          ]
+                                        ]
+                                      },
+                                      "integrationHttpMethod": "POST"
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
+                                  "version": "2.87.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigateway.Method",
+                              "version": "2.87.0"
+                            }
+                          },
+                          "PATCH": {
+                            "id": "PATCH",
+                            "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PATCH",
+                            "children": {
+                              "ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PATCH..preferences.{userId}": {
+                                "id": "ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PATCH..preferences.{userId}",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PATCH/ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PATCH..preferences.{userId}",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                                  "aws:cdk:cloudformation:props": {
+                                    "action": "lambda:InvokeFunction",
+                                    "functionName": {
+                                      "Fn::GetAtt": [
+                                        "UserPreferencesFunctionE60C62FF",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "principal": "apigateway.amazonaws.com",
+                                    "sourceArn": {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:execute-api:us-east-1:085226951177:",
+                                          {
+                                            "Ref": "UserPreferencesApi61334ABA"
+                                          },
+                                          "/",
+                                          {
+                                            "Ref": "UserPreferencesApiDeploymentStageprodABFDC0FD"
+                                          },
+                                          "/PATCH/preferences/*"
+                                        ]
+                                      ]
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                                  "version": "2.87.0"
+                                }
+                              },
+                              "ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PATCH..preferences.{userId}": {
+                                "id": "ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PATCH..preferences.{userId}",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PATCH/ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PATCH..preferences.{userId}",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                                  "aws:cdk:cloudformation:props": {
+                                    "action": "lambda:InvokeFunction",
+                                    "functionName": {
+                                      "Fn::GetAtt": [
+                                        "UserPreferencesFunctionE60C62FF",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "principal": "apigateway.amazonaws.com",
+                                    "sourceArn": {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:execute-api:us-east-1:085226951177:",
+                                          {
+                                            "Ref": "UserPreferencesApi61334ABA"
+                                          },
+                                          "/test-invoke-stage/PATCH/preferences/*"
+                                        ]
+                                      ]
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                                  "version": "2.87.0"
+                                }
+                              },
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PATCH/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                                  "aws:cdk:cloudformation:props": {
+                                    "httpMethod": "PATCH",
+                                    "resourceId": {
+                                      "Ref": "UserPreferencesApipreferencesuserId9CEBDD9C"
+                                    },
+                                    "restApiId": {
+                                      "Ref": "UserPreferencesApi61334ABA"
+                                    },
+                                    "authorizationType": "NONE",
+                                    "integration": {
+                                      "type": "AWS_PROXY",
+                                      "uri": {
+                                        "Fn::Join": [
+                                          "",
+                                          [
+                                            "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+                                            {
+                                              "Fn::GetAtt": [
+                                                "UserPreferencesFunctionE60C62FF",
+                                                "Arn"
+                                              ]
+                                            },
+                                            "/invocations"
+                                          ]
+                                        ]
+                                      },
+                                      "integrationHttpMethod": "POST"
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
+                                  "version": "2.87.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigateway.Method",
+                              "version": "2.87.0"
+                            }
+                          },
+                          "DELETE": {
+                            "id": "DELETE",
+                            "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/DELETE",
+                            "children": {
+                              "ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.DELETE..preferences.{userId}": {
+                                "id": "ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.DELETE..preferences.{userId}",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/DELETE/ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.DELETE..preferences.{userId}",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                                  "aws:cdk:cloudformation:props": {
+                                    "action": "lambda:InvokeFunction",
+                                    "functionName": {
+                                      "Fn::GetAtt": [
+                                        "UserPreferencesFunctionE60C62FF",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "principal": "apigateway.amazonaws.com",
+                                    "sourceArn": {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:execute-api:us-east-1:085226951177:",
+                                          {
+                                            "Ref": "UserPreferencesApi61334ABA"
+                                          },
+                                          "/",
+                                          {
+                                            "Ref": "UserPreferencesApiDeploymentStageprodABFDC0FD"
+                                          },
+                                          "/DELETE/preferences/*"
+                                        ]
+                                      ]
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                                  "version": "2.87.0"
+                                }
+                              },
+                              "ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.DELETE..preferences.{userId}": {
+                                "id": "ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.DELETE..preferences.{userId}",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/DELETE/ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.DELETE..preferences.{userId}",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                                  "aws:cdk:cloudformation:props": {
+                                    "action": "lambda:InvokeFunction",
+                                    "functionName": {
+                                      "Fn::GetAtt": [
+                                        "UserPreferencesFunctionE60C62FF",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "principal": "apigateway.amazonaws.com",
+                                    "sourceArn": {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:execute-api:us-east-1:085226951177:",
+                                          {
+                                            "Ref": "UserPreferencesApi61334ABA"
+                                          },
+                                          "/test-invoke-stage/DELETE/preferences/*"
+                                        ]
+                                      ]
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                                  "version": "2.87.0"
+                                }
+                              },
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/DELETE/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::ApiGateway::Method",
+                                  "aws:cdk:cloudformation:props": {
+                                    "httpMethod": "DELETE",
+                                    "resourceId": {
+                                      "Ref": "UserPreferencesApipreferencesuserId9CEBDD9C"
+                                    },
+                                    "restApiId": {
+                                      "Ref": "UserPreferencesApi61334ABA"
+                                    },
+                                    "authorizationType": "NONE",
+                                    "integration": {
+                                      "type": "AWS_PROXY",
+                                      "uri": {
+                                        "Fn::Join": [
+                                          "",
+                                          [
+                                            "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+                                            {
+                                              "Fn::GetAtt": [
+                                                "UserPreferencesFunctionE60C62FF",
+                                                "Arn"
+                                              ]
+                                            },
+                                            "/invocations"
+                                          ]
+                                        ]
+                                      },
+                                      "integrationHttpMethod": "POST"
+                                    }
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_apigateway.CfnMethod",
+                                  "version": "2.87.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_apigateway.Method",
+                              "version": "2.87.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigateway.Resource",
+                          "version": "2.87.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigateway.Resource",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigateway.ResourceBase",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_apigateway.RestApi",
+              "version": "2.87.0"
+            }
+          },
+          "FrontendBucket": {
+            "id": "FrontendBucket",
+            "path": "HealthScribeFullStack-dev/FrontendBucket",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/FrontendBucket/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::S3::Bucket",
+                  "aws:cdk:cloudformation:props": {
+                    "bucketName": "healthscribe-frontend-healthscribefullstack-dev",
+                    "publicAccessBlockConfiguration": {
+                      "blockPublicAcls": true,
+                      "blockPublicPolicy": true,
+                      "ignorePublicAcls": true,
+                      "restrictPublicBuckets": true
+                    },
+                    "tags": [
+                      {
+                        "key": "aws-cdk:auto-delete-objects",
+                        "value": "true"
+                      },
+                      {
+                        "key": "aws-cdk:cr-owned:3e4ccc57",
+                        "value": "true"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
+                  "version": "2.87.0"
+                }
+              },
+              "Policy": {
+                "id": "Policy",
+                "path": "HealthScribeFullStack-dev/FrontendBucket/Policy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "HealthScribeFullStack-dev/FrontendBucket/Policy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::S3::BucketPolicy",
+                      "aws:cdk:cloudformation:props": {
+                        "bucket": {
+                          "Ref": "FrontendBucketEFE2E19C"
+                        },
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:List*"
+                              ],
+                              "Effect": "Allow",
+                              "Principal": {
+                                "AWS": {
+                                  "Fn::GetAtt": [
+                                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                                    "Arn"
+                                  ]
+                                }
+                              },
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "FrontendBucketEFE2E19C",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "FrontendBucketEFE2E19C",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "Action": [
+                                "s3:GetBucket*",
+                                "s3:GetObject*",
+                                "s3:List*"
+                              ],
+                              "Effect": "Allow",
+                              "Principal": {
+                                "CanonicalUser": {
+                                  "Fn::GetAtt": [
+                                    "OAIE1EFC67F",
+                                    "S3CanonicalUserId"
+                                  ]
+                                }
+                              },
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "FrontendBucketEFE2E19C",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "FrontendBucketEFE2E19C",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "Action": "s3:GetObject",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "CanonicalUser": {
+                                  "Fn::GetAtt": [
+                                    "OAIE1EFC67F",
+                                    "S3CanonicalUserId"
+                                  ]
+                                }
+                              },
+                              "Resource": {
+                                "Fn::Join": [
+                                  "",
+                                  [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "FrontendBucketEFE2E19C",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "/*"
+                                  ]
+                                ]
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
+                  "version": "2.87.0"
+                }
+              },
+              "AutoDeleteObjectsCustomResource": {
+                "id": "AutoDeleteObjectsCustomResource",
+                "path": "HealthScribeFullStack-dev/FrontendBucket/AutoDeleteObjectsCustomResource",
+                "children": {
+                  "Default": {
+                    "id": "Default",
+                    "path": "HealthScribeFullStack-dev/FrontendBucket/AutoDeleteObjectsCustomResource/Default",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnResource",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CustomResource",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_s3.Bucket",
+              "version": "2.87.0"
+            }
+          },
+          "Custom::S3AutoDeleteObjectsCustomResourceProvider": {
+            "id": "Custom::S3AutoDeleteObjectsCustomResourceProvider",
+            "path": "HealthScribeFullStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider",
+            "children": {
+              "Staging": {
+                "id": "Staging",
+                "path": "HealthScribeFullStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Staging",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.AssetStaging",
+                  "version": "2.87.0"
+                }
+              },
+              "Role": {
+                "id": "Role",
+                "path": "HealthScribeFullStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.87.0"
+                }
+              },
+              "Handler": {
+                "id": "Handler",
+                "path": "HealthScribeFullStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CustomResourceProvider",
+              "version": "2.87.0"
+            }
+          },
+          "UserFilesBucket": {
+            "id": "UserFilesBucket",
+            "path": "HealthScribeFullStack-dev/UserFilesBucket",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/UserFilesBucket/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::S3::Bucket",
+                  "aws:cdk:cloudformation:props": {
+                    "bucketName": "healthscribe-storage-healthscribefullstack-dev",
+                    "corsConfiguration": {
+                      "corsRules": [
+                        {
+                          "allowedHeaders": [
+                            "*"
+                          ],
+                          "allowedMethods": [
+                            "GET",
+                            "POST",
+                            "PUT",
+                            "DELETE"
+                          ],
+                          "allowedOrigins": [
+                            "*"
+                          ]
+                        }
+                      ]
+                    },
+                    "publicAccessBlockConfiguration": {
+                      "blockPublicAcls": true,
+                      "blockPublicPolicy": true,
+                      "ignorePublicAcls": true,
+                      "restrictPublicBuckets": true
+                    },
+                    "tags": [
+                      {
+                        "key": "aws-cdk:auto-delete-objects",
+                        "value": "true"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
+                  "version": "2.87.0"
+                }
+              },
+              "Policy": {
+                "id": "Policy",
+                "path": "HealthScribeFullStack-dev/UserFilesBucket/Policy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "HealthScribeFullStack-dev/UserFilesBucket/Policy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::S3::BucketPolicy",
+                      "aws:cdk:cloudformation:props": {
+                        "bucket": {
+                          "Ref": "UserFilesBucketCFDFD8C0"
+                        },
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:List*"
+                              ],
+                              "Effect": "Allow",
+                              "Principal": {
+                                "AWS": {
+                                  "Fn::GetAtt": [
+                                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                                    "Arn"
+                                  ]
+                                }
+                              },
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "UserFilesBucketCFDFD8C0",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
+                  "version": "2.87.0"
+                }
+              },
+              "AutoDeleteObjectsCustomResource": {
+                "id": "AutoDeleteObjectsCustomResource",
+                "path": "HealthScribeFullStack-dev/UserFilesBucket/AutoDeleteObjectsCustomResource",
+                "children": {
+                  "Default": {
+                    "id": "Default",
+                    "path": "HealthScribeFullStack-dev/UserFilesBucket/AutoDeleteObjectsCustomResource/Default",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnResource",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CustomResource",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_s3.Bucket",
+              "version": "2.87.0"
+            }
+          },
+          "HealthScribeServiceRole": {
+            "id": "HealthScribeServiceRole",
+            "path": "HealthScribeFullStack-dev/HealthScribeServiceRole",
+            "children": {
+              "ImportHealthScribeServiceRole": {
+                "id": "ImportHealthScribeServiceRole",
+                "path": "HealthScribeFullStack-dev/HealthScribeServiceRole/ImportHealthScribeServiceRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.87.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/HealthScribeServiceRole/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "transcribe.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "description": "Service role for AWS HealthScribe Medical Scribe jobs",
+                    "policies": [
+                      {
+                        "policyName": "HealthScribeServicePolicy",
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "s3:DeleteObject",
+                                "s3:GetObject",
+                                "s3:ListBucket",
+                                "s3:PutObject"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "UserFilesBucketCFDFD8C0",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "Action": [
+                                "kms:Decrypt",
+                                "kms:GenerateDataKey"
+                              ],
+                              "Condition": {
+                                "StringEquals": {
+                                  "kms:ViaService": [
+                                    "s3.us-east-1.amazonaws.com"
+                                  ]
+                                }
+                              },
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    ],
+                    "roleName": "HealthScribeServiceRole-HealthScribeFullStack-dev"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.87.0"
+            }
+          },
+          "OAI": {
+            "id": "OAI",
+            "path": "HealthScribeFullStack-dev/OAI",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/OAI/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+                  "aws:cdk:cloudformation:props": {
+                    "cloudFrontOriginAccessIdentityConfig": {
+                      "comment": "OAI for HealthScribeFullStack-dev"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_cloudfront.CfnCloudFrontOriginAccessIdentity",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_cloudfront.OriginAccessIdentity",
+              "version": "2.87.0"
+            }
+          },
+          "FrontendDistribution": {
+            "id": "FrontendDistribution",
+            "path": "HealthScribeFullStack-dev/FrontendDistribution",
+            "children": {
+              "Origin1": {
+                "id": "Origin1",
+                "path": "HealthScribeFullStack-dev/FrontendDistribution/Origin1",
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.4.2"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/FrontendDistribution/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::CloudFront::Distribution",
+                  "aws:cdk:cloudformation:props": {
+                    "distributionConfig": {
+                      "enabled": true,
+                      "origins": [
+                        {
+                          "domainName": {
+                            "Fn::GetAtt": [
+                              "FrontendBucketEFE2E19C",
+                              "RegionalDomainName"
+                            ]
+                          },
+                          "id": "HealthScribeFullStackdevFrontendDistributionOrigin1E31C206D",
+                          "s3OriginConfig": {
+                            "originAccessIdentity": {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  "origin-access-identity/cloudfront/",
+                                  {
+                                    "Ref": "OAIE1EFC67F"
+                                  }
+                                ]
+                              ]
+                            }
+                          }
+                        }
+                      ],
+                      "defaultCacheBehavior": {
+                        "pathPattern": "*",
+                        "targetOriginId": "HealthScribeFullStackdevFrontendDistributionOrigin1E31C206D",
+                        "allowedMethods": [
+                          "GET",
+                          "HEAD",
+                          "OPTIONS"
+                        ],
+                        "cachedMethods": [
+                          "GET",
+                          "HEAD",
+                          "OPTIONS"
+                        ],
+                        "cachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+                        "compress": true,
+                        "viewerProtocolPolicy": "redirect-to-https"
+                      },
+                      "customErrorResponses": [
+                        {
+                          "errorCachingMinTtl": 300,
+                          "errorCode": 404,
+                          "responseCode": 200,
+                          "responsePagePath": "/index.html"
+                        },
+                        {
+                          "errorCachingMinTtl": 300,
+                          "errorCode": 403,
+                          "responseCode": 200,
+                          "responsePagePath": "/index.html"
+                        }
+                      ],
+                      "defaultRootObject": "index.html",
+                      "httpVersion": "http2",
+                      "ipv6Enabled": true
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_cloudfront.CfnDistribution",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_cloudfront.Distribution",
+              "version": "2.87.0"
+            }
+          },
+          "AuthenticatedRole": {
+            "id": "AuthenticatedRole",
+            "path": "HealthScribeFullStack-dev/AuthenticatedRole",
+            "children": {
+              "ImportAuthenticatedRole": {
+                "id": "ImportAuthenticatedRole",
+                "path": "HealthScribeFullStack-dev/AuthenticatedRole/ImportAuthenticatedRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.87.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/AuthenticatedRole/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRoleWithWebIdentity",
+                          "Condition": {
+                            "StringEquals": {
+                              "cognito-identity.amazonaws.com:aud": {
+                                "Ref": "IdentityPool"
+                              }
+                            },
+                            "ForAnyValue:StringLike": {
+                              "cognito-identity.amazonaws.com:amr": "authenticated"
+                            }
+                          },
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Federated": "cognito-identity.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policies": [
+                      {
+                        "policyName": "S3Access",
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "s3:DeleteObject",
+                                "s3:GetObject",
+                                "s3:PutObject"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": [
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/uploads/${cognito-identity.amazonaws.com:sub}/*"
+                                    ]
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/uploads/*"
+                                    ]
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/uploads/HealthScribeDemo/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "Action": "s3:GetObject",
+                              "Condition": {
+                                "StringLike": {
+                                  "s3:ExistingObjectTag/CreatedBy": "HealthScribe"
+                                }
+                              },
+                              "Effect": "Allow",
+                              "Resource": {
+                                "Fn::Join": [
+                                  "",
+                                  [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "UserFilesBucketCFDFD8C0",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "/*"
+                                  ]
+                                ]
+                              }
+                            },
+                            {
+                              "Action": "s3:GetObject",
+                              "Effect": "Allow",
+                              "Resource": [
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*/*-clinical-notes.json"
+                                    ]
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*/*-summary.json"
+                                    ]
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*/*-transcript.json"
+                                    ]
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*/clinical-notes.json"
+                                    ]
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*/summary.json"
+                                    ]
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "UserFilesBucketCFDFD8C0",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*/transcript.json"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "Action": "s3:ListBucket",
+                              "Condition": {
+                                "StringLike": {
+                                  "s3:prefix": [
+                                    "uploads/${cognito-identity.amazonaws.com:sub}/*",
+                                    "uploads/HealthScribeDemo/*",
+                                    "uploads/*",
+                                    "*/"
+                                  ]
+                                }
+                              },
+                              "Effect": "Allow",
+                              "Resource": {
+                                "Fn::GetAtt": [
+                                  "UserFilesBucketCFDFD8C0",
+                                  "Arn"
+                                ]
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      },
+                      {
+                        "policyName": "DynamoDBAccess",
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "dynamodb:DeleteItem",
+                                "dynamodb:GetItem",
+                                "dynamodb:PutItem",
+                                "dynamodb:Query",
+                                "dynamodb:Scan",
+                                "dynamodb:UpdateItem"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "PatientsTable087EEB9B",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "PatientsTable087EEB9B",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/index/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      },
+                      {
+                        "policyName": "TranscribeAccess",
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "transcribe:DeleteMedicalScribeJob",
+                                "transcribe:DeleteTranscriptionJob",
+                                "transcribe:GetMedicalScribeJob",
+                                "transcribe:GetTranscriptionJob",
+                                "transcribe:ListMedicalScribeJobs",
+                                "transcribe:ListTranscriptionJobs",
+                                "transcribe:StartMedicalScribeJob",
+                                "transcribe:StartTranscriptionJob"
+                              ],
+                              "Condition": {
+                                "StringEquals": {
+                                  "aws:RequestedRegion": "us-east-1"
+                                }
+                              },
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            },
+                            {
+                              "Action": "iam:PassRole",
+                              "Condition": {
+                                "StringEquals": {
+                                  "iam:PassedToService": "transcribe.amazonaws.com"
+                                }
+                              },
+                              "Effect": "Allow",
+                              "Resource": {
+                                "Fn::GetAtt": [
+                                  "HealthScribeServiceRole30AAD1BD",
+                                  "Arn"
+                                ]
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      },
+                      {
+                        "policyName": "ComprehendMedicalAccess",
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "comprehendmedical:DetectEntitiesV2",
+                                "comprehendmedical:DetectPHI",
+                                "comprehendmedical:InferICD10CM",
+                                "comprehendmedical:InferRxNorm",
+                                "comprehendmedical:InferSNOMEDCT"
+                              ],
+                              "Condition": {
+                                "StringEquals": {
+                                  "aws:RequestedRegion": "us-east-1"
+                                }
+                              },
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.87.0"
+            }
+          },
+          "IdentityPoolRoleAttachment": {
+            "id": "IdentityPoolRoleAttachment",
+            "path": "HealthScribeFullStack-dev/IdentityPoolRoleAttachment",
+            "attributes": {
+              "aws:cdk:cloudformation:type": "AWS::Cognito::IdentityPoolRoleAttachment",
+              "aws:cdk:cloudformation:props": {
+                "identityPoolId": {
+                  "Ref": "IdentityPool"
+                },
+                "roles": {
+                  "authenticated": {
+                    "Fn::GetAtt": [
+                      "AuthenticatedRole86104F1A",
+                      "Arn"
+                    ]
+                  }
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_cognito.CfnIdentityPoolRoleAttachment",
+              "version": "2.87.0"
+            }
+          },
+          "FrontendDeployment": {
+            "id": "FrontendDeployment",
+            "path": "HealthScribeFullStack-dev/FrontendDeployment",
+            "children": {
+              "AwsCliLayer": {
+                "id": "AwsCliLayer",
+                "path": "HealthScribeFullStack-dev/FrontendDeployment/AwsCliLayer",
+                "children": {
+                  "Code": {
+                    "id": "Code",
+                    "path": "HealthScribeFullStack-dev/FrontendDeployment/AwsCliLayer/Code",
+                    "children": {
+                      "Stage": {
+                        "id": "Stage",
+                        "path": "HealthScribeFullStack-dev/FrontendDeployment/AwsCliLayer/Code/Stage",
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.AssetStaging",
+                          "version": "2.87.0"
+                        }
+                      },
+                      "AssetBucket": {
+                        "id": "AssetBucket",
+                        "path": "HealthScribeFullStack-dev/FrontendDeployment/AwsCliLayer/Code/AssetBucket",
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                          "version": "2.87.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "HealthScribeFullStack-dev/FrontendDeployment/AwsCliLayer/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::LayerVersion",
+                      "aws:cdk:cloudformation:props": {
+                        "content": {
+                          "s3Bucket": "cdk-hnb659fds-assets-085226951177-us-east-1",
+                          "s3Key": "97ddc23e85dd268891556f73d5b9ae70f788f175c5b81b471162aa0281c24214.zip"
+                        },
+                        "description": "/opt/awscli/aws"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnLayerVersion",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.lambda_layer_awscli.AwsCliLayer",
+                  "version": "2.87.0"
+                }
+              },
+              "CustomResourceHandler": {
+                "id": "CustomResourceHandler",
+                "path": "HealthScribeFullStack-dev/FrontendDeployment/CustomResourceHandler",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.SingletonFunction",
+                  "version": "2.87.0"
+                }
+              },
+              "Asset1": {
+                "id": "Asset1",
+                "path": "HealthScribeFullStack-dev/FrontendDeployment/Asset1",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "HealthScribeFullStack-dev/FrontendDeployment/Asset1/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "HealthScribeFullStack-dev/FrontendDeployment/Asset1/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.87.0"
+                }
+              },
+              "Asset2": {
+                "id": "Asset2",
+                "path": "HealthScribeFullStack-dev/FrontendDeployment/Asset2",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "HealthScribeFullStack-dev/FrontendDeployment/Asset2/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "HealthScribeFullStack-dev/FrontendDeployment/Asset2/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.87.0"
+                }
+              },
+              "CustomResource": {
+                "id": "CustomResource",
+                "path": "HealthScribeFullStack-dev/FrontendDeployment/CustomResource",
+                "children": {
+                  "Default": {
+                    "id": "Default",
+                    "path": "HealthScribeFullStack-dev/FrontendDeployment/CustomResource/Default",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnResource",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CustomResource",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_s3_deployment.BucketDeployment",
+              "version": "2.87.0"
+            }
+          },
+          "Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C": {
+            "id": "Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C",
+            "path": "HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C",
+            "children": {
+              "ServiceRole": {
+                "id": "ServiceRole",
+                "path": "HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole",
+                "children": {
+                  "ImportServiceRole": {
+                    "id": "ImportServiceRole",
+                    "path": "HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/ImportServiceRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                              ]
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "DefaultPolicy": {
+                    "id": "DefaultPolicy",
+                    "path": "HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": [
+                                    "s3:GetBucket*",
+                                    "s3:GetObject*",
+                                    "s3:List*"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": [
+                                    "arn:aws:s3:::cdk-hnb659fds-assets-085226951177-us-east-1",
+                                    "arn:aws:s3:::cdk-hnb659fds-assets-085226951177-us-east-1/*"
+                                  ]
+                                },
+                                {
+                                  "Action": [
+                                    "s3:Abort*",
+                                    "s3:DeleteObject*",
+                                    "s3:GetBucket*",
+                                    "s3:GetObject*",
+                                    "s3:List*",
+                                    "s3:PutObject",
+                                    "s3:PutObjectLegalHold",
+                                    "s3:PutObjectRetention",
+                                    "s3:PutObjectTagging",
+                                    "s3:PutObjectVersionTagging"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "FrontendBucketEFE2E19C",
+                                        "Arn"
+                                      ]
+                                    },
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          {
+                                            "Fn::GetAtt": [
+                                              "FrontendBucketEFE2E19C",
+                                              "Arn"
+                                            ]
+                                          },
+                                          "/*"
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "Action": [
+                                    "cloudfront:CreateInvalidation",
+                                    "cloudfront:GetInvalidation"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": "*"
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+                            "roles": [
+                              {
+                                "Ref": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                          "version": "2.87.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Policy",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.87.0"
+                }
+              },
+              "Code": {
+                "id": "Code",
+                "path": "HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.87.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.87.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.87.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": "cdk-hnb659fds-assets-085226951177-us-east-1",
+                      "s3Key": "9eb41a5505d37607ac419321497a4f8c21cf0ee1f9b4a6b29aa04301aea5c7fd.zip"
+                    },
+                    "role": {
+                      "Fn::GetAtt": [
+                        "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265",
+                        "Arn"
+                      ]
+                    },
+                    "environment": {
+                      "variables": {
+                        "AWS_CA_BUNDLE": "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
+                      }
+                    },
+                    "handler": "index.handler",
+                    "layers": [
+                      {
+                        "Ref": "FrontendDeploymentAwsCliLayer77737BA0"
+                      }
+                    ],
+                    "runtime": "python3.9",
+                    "timeout": 900
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.87.0"
+            }
+          },
+          "FrontendUrl": {
+            "id": "FrontendUrl",
+            "path": "HealthScribeFullStack-dev/FrontendUrl",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "ApiUrl": {
+            "id": "ApiUrl",
+            "path": "HealthScribeFullStack-dev/ApiUrl",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "UserPoolId": {
+            "id": "UserPoolId",
+            "path": "HealthScribeFullStack-dev/UserPoolId",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "UserPoolClientId": {
+            "id": "UserPoolClientId",
+            "path": "HealthScribeFullStack-dev/UserPoolClientId",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "IdentityPoolId": {
+            "id": "IdentityPoolId",
+            "path": "HealthScribeFullStack-dev/IdentityPoolId",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "TableName": {
+            "id": "TableName",
+            "path": "HealthScribeFullStack-dev/TableName",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "PatientsTableName": {
+            "id": "PatientsTableName",
+            "path": "HealthScribeFullStack-dev/PatientsTableName",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "PatientsTableArn": {
+            "id": "PatientsTableArn",
+            "path": "HealthScribeFullStack-dev/PatientsTableArn",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "FunctionName": {
+            "id": "FunctionName",
+            "path": "HealthScribeFullStack-dev/FunctionName",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "BucketName": {
+            "id": "BucketName",
+            "path": "HealthScribeFullStack-dev/BucketName",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "UserFilesBucketName": {
+            "id": "UserFilesBucketName",
+            "path": "HealthScribeFullStack-dev/UserFilesBucketName",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "DistributionId": {
+            "id": "DistributionId",
+            "path": "HealthScribeFullStack-dev/DistributionId",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "HealthScribeServiceRoleArn": {
+            "id": "HealthScribeServiceRoleArn",
+            "path": "HealthScribeFullStack-dev/HealthScribeServiceRoleArn",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.87.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "HealthScribeFullStack-dev/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "HealthScribeFullStack-dev/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.87.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.4.2"
+            }
+          },
+          "BootstrapVersion": {
+            "id": "BootstrapVersion",
+            "path": "HealthScribeFullStack-dev/BootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnParameter",
+              "version": "2.87.0"
+            }
+          },
+          "CheckBootstrapVersion": {
+            "id": "CheckBootstrapVersion",
+            "path": "HealthScribeFullStack-dev/CheckBootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnRule",
+              "version": "2.87.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "aws-cdk-lib.Stack",
+          "version": "2.87.0"
+        }
+      },
+      "Tree": {
+        "id": "Tree",
+        "path": "Tree",
+        "constructInfo": {
+          "fqn": "constructs.Construct",
+          "version": "10.4.2"
+        }
+      }
+    },
+    "constructInfo": {
+      "fqn": "aws-cdk-lib.App",
+      "version": "2.87.0"
+    }
+  }
+}

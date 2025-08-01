@@ -1,0 +1,312 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'HealthScribe User Preferences Infrastructure'
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    Description: Environment name (dev, staging, prod)
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+
+Resources:
+  # DynamoDB Table
+  UserPreferencesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'UserPreferences-${Environment}'
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: Project
+          Value: HealthScribe
+        - Key: Component
+          Value: UserPreferences
+        - Key: Environment
+          Value: !Ref Environment
+
+  # Lambda Execution Role
+  UserPreferencesLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'UserPreferencesLambdaRole-${Environment}'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt UserPreferencesTable.Arn
+
+  # Lambda Function
+  UserPreferencesFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub 'UserPreferencesApi-${Environment}'
+      Runtime: nodejs18.x
+      Handler: index.handler
+      Role: !GetAtt UserPreferencesLambdaRole.Arn
+      Code:
+        ZipFile: |
+          const AWS = require('aws-sdk');
+          const dynamodb = new AWS.DynamoDB.DocumentClient();
+          
+          const TABLE_NAME = process.env.USER_PREFERENCES_TABLE_NAME;
+          
+          const corsHeaders = {
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+              'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+          };
+          
+          const DEFAULT_PREFERENCES = {
+              providerName: '',
+              providerSpecialty: 'FAMILY_MEDICINE',
+              enabledNoteTemplates: ['HISTORY_AND_PHYSICAL', 'GIRPP', 'BIRP', 'SIRP', 'DAP', 'BH_SOAP', 'PH_SOAP'],
+              defaultNoteTemplate: 'HISTORY_AND_PHYSICAL',
+              comprehendMedicalEnabled: true,
+              billingCycle: 'MONTHLY',
+              region: 'us-east-1',
+              apiTiming: false,
+              defaultPlaybackSpeed: 1,
+              skipInterval: 5,
+              autoScroll: true,
+              defaultTab: 'transcript',
+              smallTalkDefault: false,
+              silenceDefault: false,
+              confidenceThreshold: 75,
+              autoExtract: false,
+          };
+          
+          exports.handler = async (event) => {
+              console.log('Event:', JSON.stringify(event, null, 2));
+              
+              try {
+                  const { httpMethod, pathParameters, body } = event;
+                  const userId = pathParameters?.userId || 'anonymous-user';
+                  
+                  if (httpMethod === 'OPTIONS') {
+                      return {
+                          statusCode: 200,
+                          headers: corsHeaders,
+                          body: JSON.stringify({ message: 'CORS preflight successful' })
+                      };
+                  }
+                  
+                  switch (httpMethod) {
+                      case 'GET':
+                          return await getPreferences(userId);
+                      case 'PUT':
+                          return await createOrUpdatePreferences(userId, JSON.parse(body || '{}'));
+                      default:
+                          return {
+                              statusCode: 405,
+                              headers: corsHeaders,
+                              body: JSON.stringify({ error: 'Method not allowed' })
+                          };
+                  }
+              } catch (error) {
+                  console.error('Error:', error);
+                  return {
+                      statusCode: 500,
+                      headers: corsHeaders,
+                      body: JSON.stringify({ 
+                          error: 'Internal server error',
+                          message: error.message 
+                      })
+                  };
+              }
+          };
+          
+          async function getPreferences(userId) {
+              try {
+                  const params = {
+                      TableName: TABLE_NAME,
+                      Key: {
+                          PK: `USER#${userId}`,
+                          SK: 'PREFERENCES'
+                      }
+                  };
+                  
+                  const result = await dynamodb.get(params).promise();
+                  
+                  return {
+                      statusCode: 200,
+                      headers: corsHeaders,
+                      body: JSON.stringify(result.Item ? result.Item.preferences : DEFAULT_PREFERENCES)
+                  };
+              } catch (error) {
+                  console.error('Error getting preferences:', error);
+                  throw error;
+              }
+          }
+          
+          async function createOrUpdatePreferences(userId, preferences) {
+              try {
+                  const now = new Date().toISOString();
+                  
+                  const params = {
+                      TableName: TABLE_NAME,
+                      Item: {
+                          PK: `USER#${userId}`,
+                          SK: 'PREFERENCES',
+                          preferences: { ...DEFAULT_PREFERENCES, ...preferences },
+                          version: 1,
+                          createdAt: now,
+                          updatedAt: now
+                      }
+                  };
+                  
+                  await dynamodb.put(params).promise();
+                  
+                  return {
+                      statusCode: 200,
+                      headers: corsHeaders,
+                      body: JSON.stringify({ 
+                          message: 'Preferences saved successfully',
+                          preferences: params.Item.preferences
+                      })
+                  };
+              } catch (error) {
+                  console.error('Error creating/updating preferences:', error);
+                  throw error;
+              }
+          }
+      Environment:
+        Variables:
+          USER_PREFERENCES_TABLE_NAME: !Ref UserPreferencesTable
+          REGION: !Ref AWS::Region
+      Timeout: 30
+      MemorySize: 256
+
+  # API Gateway
+  UserPreferencesApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub 'UserPreferencesApi-${Environment}'
+      Description: API for user preferences management
+      EndpointConfiguration:
+        Types:
+          - REGIONAL
+
+  # API Gateway Resources
+  PreferencesResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref UserPreferencesApi
+      ParentId: !GetAtt UserPreferencesApi.RootResourceId
+      PathPart: preferences
+
+  UserIdResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref UserPreferencesApi
+      ParentId: !Ref PreferencesResource
+      PathPart: '{userId}'
+
+  # API Gateway Methods
+  UserPreferencesMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref UserPreferencesApi
+      ResourceId: !Ref UserIdResource
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UserPreferencesFunction.Arn}/invocations'
+
+  # CORS Options Method
+  OptionsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref UserPreferencesApi
+      ResourceId: !Ref UserIdResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        IntegrationResponses:
+          - StatusCode: '200'
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: true
+            method.response.header.Access-Control-Allow-Methods: true
+            method.response.header.Access-Control-Allow-Origin: true
+
+  # Lambda Permission for API Gateway
+  LambdaInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref UserPreferencesFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${UserPreferencesApi}/*/*/*'
+
+  # API Gateway Deployment
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - UserPreferencesMethod
+      - OptionsMethod
+    Properties:
+      RestApiId: !Ref UserPreferencesApi
+      StageName: prod
+
+Outputs:
+  ApiUrl:
+    Description: User Preferences API URL
+    Value: !Sub 'https://${UserPreferencesApi}.execute-api.${AWS::Region}.amazonaws.com/prod'
+    Export:
+      Name: !Sub '${AWS::StackName}-ApiUrl'
+
+  TableName:
+    Description: DynamoDB table name
+    Value: !Ref UserPreferencesTable
+    Export:
+      Name: !Sub '${AWS::StackName}-TableName'
+
+  FunctionName:
+    Description: Lambda function name
+    Value: !Ref UserPreferencesFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-FunctionName'

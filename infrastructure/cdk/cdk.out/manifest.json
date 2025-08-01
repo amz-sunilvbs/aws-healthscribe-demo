@@ -1,0 +1,476 @@
+{
+  "version": "32.0.0",
+  "artifacts": {
+    "HealthScribeFullStack-dev.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "HealthScribeFullStack-dev.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "HealthScribeFullStack-dev": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://085226951177/us-east-1",
+      "properties": {
+        "templateFile": "HealthScribeFullStack-dev.template.json",
+        "tags": {
+          "Component": "FullStack",
+          "Environment": "dev",
+          "Project": "HealthScribe"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::085226951177:role/cdk-hnb659fds-deploy-role-085226951177-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::085226951177:role/cdk-hnb659fds-cfn-exec-role-085226951177-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-085226951177-us-east-1/140cbfba37b4b438db787f1887b114bc595981827109042aa5295ffcb88deafa.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "HealthScribeFullStack-dev.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::085226951177:role/cdk-hnb659fds-lookup-role-085226951177-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "HealthScribeFullStack-dev.assets"
+      ],
+      "metadata": {
+        "/HealthScribeFullStack-dev": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Component",
+                "Value": "FullStack"
+              },
+              {
+                "Key": "Environment",
+                "Value": "dev"
+              },
+              {
+                "Key": "Project",
+                "Value": "HealthScribe"
+              }
+            ]
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPool/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPool6BA7E5F2"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPoolClient/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolClient2F5918F7"
+          }
+        ],
+        "/HealthScribeFullStack-dev/IdentityPool": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IdentityPool"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "UserPreferencesTableA0B50479"
+            }
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesTableA0B50479"
+          }
+        ],
+        "/HealthScribeFullStack-dev/PatientsTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "PatientsTable087EEB9B"
+            }
+          }
+        ],
+        "/HealthScribeFullStack-dev/PatientsTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PatientsTable087EEB9B"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesFunctionServiceRoleAC07CD09"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesFunctionServiceRoleDefaultPolicy8500D257"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesFunctionE60C62FF"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApi61334ABA"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/CloudWatchRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApiCloudWatchRoleBC82B2D8"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Account": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApiAccount8DA8AF12"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApiDeploymentA4E206DE3c7346e4abddfac9d2b9991016a42268"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApiDeploymentStageprodABFDC0FD"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApiEndpoint0C1D5AE7"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApiOPTIONS6F6E6C0D"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesDDA6FAC8"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesOPTIONS8863B373"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserId9CEBDD9C"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdOPTIONS646A7D5C"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/GET/ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.GET..preferences.{userId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdGETApiPermissionHealthScribeFullStackdevUserPreferencesApiA2CA09C6GETpreferencesuserId65CC2F28"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/GET/ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.GET..preferences.{userId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdGETApiPermissionTestHealthScribeFullStackdevUserPreferencesApiA2CA09C6GETpreferencesuserIdC14BB3BC"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdGET8103E2AF"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PUT/ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PUT..preferences.{userId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdPUTApiPermissionHealthScribeFullStackdevUserPreferencesApiA2CA09C6PUTpreferencesuserId416133A5"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PUT/ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PUT..preferences.{userId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdPUTApiPermissionTestHealthScribeFullStackdevUserPreferencesApiA2CA09C6PUTpreferencesuserId0B35BF3D"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PUT/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdPUT859B15BD"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PATCH/ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PATCH..preferences.{userId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdPATCHApiPermissionHealthScribeFullStackdevUserPreferencesApiA2CA09C6PATCHpreferencesuserId3CDD7A04"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PATCH/ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.PATCH..preferences.{userId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdPATCHApiPermissionTestHealthScribeFullStackdevUserPreferencesApiA2CA09C6PATCHpreferencesuserIdAB1E8840"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/PATCH/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdPATCHD120ABC2"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/DELETE/ApiPermission.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.DELETE..preferences.{userId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdDELETEApiPermissionHealthScribeFullStackdevUserPreferencesApiA2CA09C6DELETEpreferencesuserId5E9F9EA8"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/DELETE/ApiPermission.Test.HealthScribeFullStackdevUserPreferencesApiA2CA09C6.DELETE..preferences.{userId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdDELETEApiPermissionTestHealthScribeFullStackdevUserPreferencesApiA2CA09C6DELETEpreferencesuserIdAE8593F3"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPreferencesApi/Default/preferences/{userId}/DELETE/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPreferencesApipreferencesuserIdDELETEB7A36396"
+          }
+        ],
+        "/HealthScribeFullStack-dev/FrontendBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketEFE2E19C"
+          }
+        ],
+        "/HealthScribeFullStack-dev/FrontendBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketPolicy1DFF75D9"
+          }
+        ],
+        "/HealthScribeFullStack-dev/FrontendBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendBucketAutoDeleteObjectsCustomResourceDB860B32"
+          }
+        ],
+        "/HealthScribeFullStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/HealthScribeFullStack-dev/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserFilesBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFilesBucketCFDFD8C0"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserFilesBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFilesBucketPolicyAB4E8050"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserFilesBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFilesBucketAutoDeleteObjectsCustomResourceFED4165F"
+          }
+        ],
+        "/HealthScribeFullStack-dev/HealthScribeServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HealthScribeServiceRole30AAD1BD"
+          }
+        ],
+        "/HealthScribeFullStack-dev/OAI/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OAIE1EFC67F"
+          }
+        ],
+        "/HealthScribeFullStack-dev/FrontendDistribution/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendDistributionE6EAF405"
+          }
+        ],
+        "/HealthScribeFullStack-dev/AuthenticatedRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuthenticatedRole86104F1A"
+          }
+        ],
+        "/HealthScribeFullStack-dev/IdentityPoolRoleAttachment": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IdentityPoolRoleAttachment"
+          }
+        ],
+        "/HealthScribeFullStack-dev/FrontendDeployment/AwsCliLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendDeploymentAwsCliLayer77737BA0"
+          }
+        ],
+        "/HealthScribeFullStack-dev/FrontendDeployment/CustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendDeploymentCustomResource068A52DB"
+          }
+        ],
+        "/HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+          }
+        ],
+        "/HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF"
+          }
+        ],
+        "/HealthScribeFullStack-dev/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536"
+          }
+        ],
+        "/HealthScribeFullStack-dev/FrontendUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FrontendUrl"
+          }
+        ],
+        "/HealthScribeFullStack-dev/ApiUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiUrl"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPoolId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolId"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserPoolClientId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolClientId"
+          }
+        ],
+        "/HealthScribeFullStack-dev/IdentityPoolId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IdentityPoolId"
+          }
+        ],
+        "/HealthScribeFullStack-dev/TableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TableName"
+          }
+        ],
+        "/HealthScribeFullStack-dev/PatientsTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PatientsTableName"
+          }
+        ],
+        "/HealthScribeFullStack-dev/PatientsTableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PatientsTableArn"
+          }
+        ],
+        "/HealthScribeFullStack-dev/FunctionName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FunctionName"
+          }
+        ],
+        "/HealthScribeFullStack-dev/BucketName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketName"
+          }
+        ],
+        "/HealthScribeFullStack-dev/UserFilesBucketName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserFilesBucketName"
+          }
+        ],
+        "/HealthScribeFullStack-dev/DistributionId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DistributionId"
+          }
+        ],
+        "/HealthScribeFullStack-dev/HealthScribeServiceRoleArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HealthScribeServiceRoleArn"
+          }
+        ],
+        "/HealthScribeFullStack-dev/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/HealthScribeFullStack-dev/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/HealthScribeFullStack-dev/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "HealthScribeFullStack-dev"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

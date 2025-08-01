@@ -1,0 +1,1 @@
+import{_ as o,l as p,e as n,aM as c,m as i}from"./index-smBBxyC0.js";function u(t){var{type:e="success",wrapText:a=!0}=t,r=o(t,["type","wrapText"]);const s=p("StatusIndicator",{props:{colorOverride:r.colorOverride,type:e,wrapText:a}});return n.createElement(c,Object.assign({type:e,wrapText:a},r,s))}i(u,"StatusIndicator");export{u as S};

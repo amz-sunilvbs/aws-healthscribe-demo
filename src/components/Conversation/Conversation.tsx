@@ -17,7 +17,7 @@ import { IHealthScribeTranscript } from '@/types/HealthScribeTranscript';
 import { getHealthScribeJob } from '@/utils/HealthScribeApi';
 import { getObject, getS3Object } from '@/utils/S3Api';
 
-import { ConversationHeader } from './ConversationHeader';
+import { EncounterHeader } from './ConversationHeader';
 import LeftPanel from './LeftPanel';
 import RightPanel from './RightPanel';
 import TopPanel from './TopPanel';
@@ -31,6 +31,7 @@ export default function Conversation() {
     const [jobLoading, setJobLoading] = useState(true); // Is getHealthScribeJob in progress
     const [jobDetails, setJobDetails] = useState<MedicalScribeJob | null>(null); // HealthScribe job details
     const [showOutputModal, setShowOutputModal] = useState<boolean>(false); // Is view results modal open
+    const [deleteModalActive, setDeleteModalActive] = useState<boolean>(false); // Is delete modal open
 
     // Outputs - transcript and summary. Set after stream is in a completed status
     const [transcript, setTranscript] = useState<IHealthScribeTranscript>();
@@ -91,7 +92,7 @@ export default function Conversation() {
     return (
         <ContentLayout
             headerVariant={'high-contrast'}
-            header={<ConversationHeader jobDetails={jobDetails} setShowOutputModal={setShowOutputModal} />}
+            header={<EncounterHeader jobDetails={jobDetails} setShowOutputModal={setShowOutputModal} setDeleteModalActive={setDeleteModalActive} />}
         >
             {showOutputModal && (
                 <Suspense fallback={<ModalLoader />}>
